@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEBRI BLOG</title>
+    <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiNNTKypUcbQULTsBvgTBjynHonvLbVTG41RxeWBhUCsm1mTvwZDxAP9J6pYjLZXduD75anAOx5-tbIEDxm9VN1vca56rvNx0Xe-flE5tEhSv6jGLi42KJw0XyyTy_GtATtHnlaD0Sa2HGDEutN_UuklewZAJA5WlKIiJTpH1wFUQk-FHxA69JZIvqbexr_/w400-h400/EJOT%20LOGO%20(2).png" type="image/icon">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter untuk tampilan modern -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'], 
+                    },
+                    colors: {
+                        brand: {
+                            red: '#DC2626', 
+                            dark: '#050505', 
+                            surface: '#121212'
+                        }
+                    },
+                    animation: {
+                        'marquee-left': 'marquee-left 80s linear infinite', // Diperlambat menjadi 80s agar mudah dibaca
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        'marquee-left': { 
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .ambient-glow {
+            background: radial-gradient(circle at center, rgba(153, 27, 27, 0.25) 0%, rgba(5, 5, 5, 0) 70%);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #DC2626;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .text-outline {
+            -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+        }
+
+        /* --- ANIMASI MASUK HALAMAN & SCROLL --- */
+        
+        /* 1. Animasi Masuk Halaman (Fade In Body) */
+        body {
+            opacity: 0;
+            animation: pageEntry 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes pageEntry {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* 2. Animasi Scroll (Reveal) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px); /* Geser ke bawah sedikit */
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); /* Easing yang halus */
+            filter: blur(5px); /* Efek blur awal */
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* Stagger delay classes if needed manually, but Observer is usually enough */
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        @keyframes blink {
+  0%,
+  100% {
+    border-color: transparent;
+  }
+  50% {
+    border-color: var(--text-color);
+  }
+}
+
+/* Typewriter Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: #d0ff00;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+/* --- CARD INTERAKTIF --- */
+        .card {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: linear-gradient(-45deg, #f89b29 0%, #ff0f7b 100% );
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card svg {
+  width: 48px;
+  fill: #333;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card:hover {
+  transform: rotate(-5deg) scale(1.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card:hover .card__content {
+  transform: translate(-50%, -50%) rotate(0deg);
+  opacity: 1;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  font-weight: 700;
+}
+
+.card__description {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #777;
+  line-height: 1.4;
+}
+
+.card:hover svg {
+  scale: 0;
+  transform: rotate(-45deg);
+}
+    </style>
+</head>
+<body class="bg-brand-dark text-white font-sans antialiased overflow-x-hidden selection:bg-brand-red selection:text-white">
+
+    <!-- Efek Cahaya Latar Belakang (Fixed) -->
+    <div class="fixed inset-0 z-0 pointer-events-none ambient-glow"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-sm border-b border-white/5 bg-brand-dark/80" id="navbar">
+        <div class="max-w-7xl mx-auto px-3 py-1 flex justify-between items-center">
+            <!-- Logo -->
+            <a onclick="window.location.href = window.location.pathname" class="flex-shrink-0 cursor-pointer group flex items-center gap-3">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuKg0wmXDKiBBcpKOhJx-eYM4Zx8HEIBpFNkroFocr-rhldYTZUD8I9o2-GpUyc_Ubg3COYy2Tmuwuutnmne1yOwCdlaO-Ha88AnzQO3JsZODw2pAufBWKHHNmUbocE_-mrDiJ1uV5gXDr2rjhXQGshlDbQo4tLSnisT3qCOfefHYatQSsmoZA0dyk-qfF/w400-h400/VEKTOR%20NEW%20LOGO%20(1)PNG.png?q=80&w=1000&auto=format&fit=crop" 
+                             alt="King Ejot Logo" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/100x100/7f1d1d/ffffff?text=KE';"
+                             class="h-10 w-10 object-contain rounded-full shadow-[0_0_10px_rgba(185,28,28,0.4)] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] group-hover:scale-110">
+                    
+                    <h1 class="text-xl md:text-3xl font-bold font-sans p-2 rounded-lg transition-all duration-300">
+                        <span class="transition-all duration-300 hover-text-red group-hover:text-shadow-[0_0_15px_rgba(239,68,68,0.8)]">FEBRI<i class="text-xs font-normal">go</i>BLOG</span>
+                    </h1>
+                </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="text-sm font-medium hover:text-brand-red transition-colors">Beranda</a>
+                <a href="#tulisan" class="text-sm font-medium hover:text-brand-red transition-colors">Tulisan</a>
+                <a href="#quotes" class="text-sm font-medium hover:text-brand-red transition-colors">Quotes</a>
+                <a href="#proyek" class="text-sm font-medium hover:text-brand-red transition-colors">Galleri</a>
+                <a href="#favorites" class="text-sm font-medium hover:text-brand-red transition-colors">Koleksi</a>
+                <a href="#tentang" class="text-sm font-medium hover:text-brand-red transition-colors">Tentang</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden z-50 text-white transition-transform hover:scale-110" onclick="toggleMenu()">
+                <i data-lucide="menu" id="icon-menu" class="w-6 h-8 block"></i>
+                <i data-lucide="x" id="icon-close" class="w-10 h-10 hidden"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-brand-dark/95 backdrop-blur-xl flex flex-col justify-start items-center pt-24 space-y-8 transform translate-x-full transition-transform duration-300 md:hidden z-40 h-screen w-screen">
+            <a href="#home" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Beranda</a>
+            <a href="#tulisan" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Tulisan</a>
+            <a href="#quotes" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Quotes</a>
+            <a href="#proyek" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Galleri</a>
+            <a href="#favorites" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Koleksi</a>
+            <a href="#tentang" class="text-3xl font-bold hover:text-brand-red transition-colors" onclick="toggleMenu()">Tentang</a>
+            
+            <div class="pt-8">
+                <a href="#subscribe" onclick="toggleMenu()" class="bg-brand-red hover:bg-red-700 text-white text-lg font-semibold px-8 py-3 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.4)] transition-all">
+                    Langganan
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10">
+
+        <!-- HERO SECTION -->
+        <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center pt-14 pb-20">
+            <!-- Added reveal classes with delays -->
+            <p class="reveal text-brand-red text-xs md:text-sm tracking-[0.2em] font-bold uppercase mb-6">
+                Welcome to My Blog
+            </p>
+
+            <h1 class="reveal delay-100 text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-tight mb-2">
+                AKU Berpikir,
+            </h1>
+            <h1 class="reveal delay-200 text-xl md:text-2xl lg:text-3xl font-black tracking-tight leading-tight text-brand-red mb-8 drop-shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+                Maka <br>
+                <span class="text-4xl md:text-6xl lg:text-7xl" id="typewriter" class="text-maroon-500"></span><span class="cursor">&nbsp;</span>
+            </h1>
+            <p class="reveal delay-300 text-gray-400 text-sm md:text-xl max-w-2xl mx-auto mb-12 font-light leading-relaxed">
+                “Kau punya caramu sendiri. Aku punya caraku sendiri. Adapun cara yang benar, cara yang tepat, dan satu-satunya cara, itu tidak ada.”
+                ― FEBRI MANGASHI BIO NILLE
+            </p>
+            <div class="reveal delay-300 flex flex-row items-center gap-6 md:gap-20 lg:gap-24">
+                <a href="#tulisan" class="bg-red-800 text-white hover:text-red-700 font-semibold hover:font-bold px-6 py-2 rounded-full hover:bg-white transition-all hover:scale-105">
+                    Lihat Tulisanku
+                </a>
+                <a href="#favorites" class="flex items-center gap-2 font-semibold hover:font-bold hover:text-brand-red transition-colors group hover:scale-105">
+                    Koleksiku <i data-lucide="arrow-right" class="w-4 h-4 font-extrabold group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- SECTION: TULISAN TERBARU -->
+        <section id="tulisan" class="py-24 px-6 max-w-7xl mx-auto">
+            <div class="reveal flex items-center justify-between mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold border-l-4 border-brand-red pl-4">Tulisanku</h2>
+                <a style="display: none;" href="https://blog.ejotsquad.xyz/" target="_blank" class="text-sm text-gray-400 hover:text-white transition-colors">Lihat Semua -></a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Blog Card 1 -->
+                <article onclick="openArticleModal(this)" class="reveal delay-100 group bg-white/5 rounded-2xl overflow-hidden hover:bg-white/10 transition-colors border border-white/5 cursor-pointer">
+                    <div class="h-48 bg-gray-800 overflow-hidden relative">
+                        <img src="https://posterwa.com/cdn/shop/files/VINLANDSAGA3_2fdad9e6-8ab0-4f55-b4ea-b86ac8a6128d.jpg?v=1714562830" alt="Blog 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute top-4 left-4 bg-brand-red text-xs font-bold px-3 py-1 rounded-full text-white">FILOSOFI</div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-500 text-xs mb-2">4 Maret 2026</p>
+                        <h3 class="text-xl font-bold mb-3 group-hover:text-brand-red transition-colors">I Have No Enemies</h3>
+                        <p class="text-gray-400 text-sm line-clamp-3">Sebuah pemahaman mendalam dari Thorfinn tentang kedamaian sejati, bahwa tidak ada satu pun orang di dunia ini yang pantas menjadi musuh kita.</p>
+                        <!-- Hidden Content for Modal -->
+                        <div class="hidden full-content">
+                            <p><strong>"Saya tidak punya musuh."</strong> Kalimat sederhana namun begitu kuat yang diucapkan oleh Thorfinn dalam seri <em>Vinland Saga</em> ini menyimpan kedalaman filosofis yang luar biasa.</p>
+                            <p>Di dunia yang terus menerus mendorong kita untuk berkompetisi, membalas dendam, dan mencari lawan untuk ditaklukkan, menyadari bahwa kebencian hanyalah beban adalah sebuah pembebasan yang sejati. Kita sering kali memproyeksikan rasa frustrasi dan kemarahan kita kepada orang lain, menjadikan mereka 'musuh' dalam cerita hidup kita.</p>
+                            <p>Namun, kedamaian sejati tidak akan pernah datang dari mengalahkan semua orang yang menghalangi kita. Kedamaian datang dari dalam diri, dari pencerahan bahwa pada dasarnya, tidak ada manusia yang terlahir sebagai musuh. Kita semua hanya manusia yang sedang berjuang dengan penderitaan, ketidaktahuan, dan trauma kita masing-masing. Memaafkan bukanlah tanda kelemahan, melainkan wujud kekuatan dan kedewasaan tertinggi.</p>
+                        </div>
+                    </div>
+                </article>
+                <!-- Blog Card 2 -->
+                <article onclick="openArticleModal(this)" class="reveal delay-200 group bg-white/5 rounded-2xl overflow-hidden hover:bg-white/10 transition-colors border border-white/5 cursor-pointer">
+                    <div class="h-48 bg-gray-800 overflow-hidden relative">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiHw03JmCJQUhqpesRWTlDabNJeQK6uwI-OHeBi4pBBUFtnmo_a76NIGOhY_AIe5Ub4oKVTcJjd3qPOhIArDVZtmJRUHmL4AKu3OBjlNDRWX8aVZOKUhSh4bJ9qjEgKV576JoP9OsEv_tXs8pdHn182msokgLqs5H09Clnj__CY7RT5G8NOJFj7429NW8Ye/s320/WALL2.jpg" alt="Blog 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded-full">EKSISTENSIALISME</div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-500 text-xs mb-2">28 Februari 2026</p>
+                        <h3 class="text-xl font-bold mb-3 group-hover:text-brand-red transition-colors">Aku Dikutuk untuk Menjadi Bebas</h3>
+                        <p class="text-gray-400 text-sm line-clamp-3">Pemikiran Jean-Paul Sartre tentang beban dari kebebasan mutlak. Bagaimana kita bertanggung jawab penuh atas pilihan dan eksistensi kita sendiri.</p>
+                        <!-- Hidden Content for Modal -->
+                        <div class="hidden full-content">
+                            <p><em>"Man is condemned to be free."</em> (Manusia dikutuk untuk bebas). Kutipan ini adalah inti sari dari pemikiran filsuf eksistensialisme Prancis, Jean-Paul Sartre.</p>
+                            <p>Mengapa Sartre menggunakan kata 'dikutuk'? Bukankah kebebasan adalah sesuatu yang kita dambakan? Sartre berargumen bahwa dengan kebebasan yang mutlak, datanglah tanggung jawab yang mutlak pula. Karena tidak ada takdir yang sudah dituliskan, tidak ada sifat dasar bawaan (esensi mendahului eksistensi), kita tidak bisa menyalahkan Tuhan, lingkungan, orang tua, atau masa lalu atas siapa diri kita saat ini.</p>
+                            <p>Kita adalah murni hasil dari pilihan-pilihan yang kita buat setiap detik. Kesadaran akan kebebasan ini seringkali terasa menakutkan dan menimbulkan kecemasan mendalam (<em>angst</em>). Ketiadaan alasan baku atau pedoman hidup yang absolut berarti kitalah sang penulis naskah, yang harus menciptakan makna hidup kita sendiri dari ketiadaan.</p>
+                        </div>
+                    </div>
+                </article>
+                <!-- Blog Card 3 -->
+                <article onclick="openArticleModal(this)" class="reveal delay-300 group bg-white/5 rounded-2xl overflow-hidden hover:bg-white/10 transition-colors border border-white/5 cursor-pointer">
+                    <div class="h-48 bg-gray-800 overflow-hidden relative">
+                        <img src="https://musica.id/wordpress/wp-content/uploads/2021/12/Taman-Langit-scaled-1.jpeg" alt="Blog 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute top-4 left-4 bg-brand-red text-xs font-bold px-3 py-1 rounded-full text-white">MUSIK & MAKNA</div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-500 text-xs mb-2">20 Februari 2026</p>
+                        <h3 class="text-xl font-bold mb-3 group-hover:text-brand-red transition-colors">Hidup Untukmu, Mati Tanpamu</h3>
+                        <p class="text-gray-400 text-sm line-clamp-3">Refleksi dari lirik lagu NOAH tentang keterikatan yang terlalu dalam, ketika eksistensi diri sepenuhnya bergantung pada keberadaan orang lain.</p>
+                        <!-- Hidden Content for Modal -->
+                        <div class="hidden full-content">
+                            <p>"Hidup untukmu, mati tanpamu." Sepenggal lirik dari NOAH ini jika didengarkan sekilas terdengar sangat romantis, seolah menunjukkan betapa besarnya cinta seseorang. Namun jika kita bedah lebih dalam, kalimat ini menyimpan sisi yang cukup tragis.</p>
+                            <p>Lirik tersebut menggambarkan sebuah keterikatan emosional (<em>attachment</em>) yang begitu absolut. Ketika seseorang menempatkan eksistensi dan tujuan hidupnya sepenuhnya pada keberadaan orang lain, ia perlahan kehilangan identitas dirinya yang mandiri.</p>
+                            <p>Dalam cinta maupun kehidupan bersosial, menempatkan satu orang sebagai satu-satunya poros kehidupan adalah sebuah pertaruhan psikologis yang sangat berbahaya. Ketika poros itu pergi atau runtuh, maka dunia kita pun akan ikut hancur dan kehilangan maknanya. Lagu ini menjadi pengingat yang indah sekaligus kelam: bahwa sebelum kita memutuskan untuk hidup bagi orang lain, kita harus belajar dan mampu untuk hidup bagi diri kita sendiri terlebih dahulu.</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- SECTION: QUOTES (Kata-Kata) -->
+        <section id="quotes" class="py-24 bg-brand-surface relative border-y border-white/5 overflow-hidden">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-brand-red/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-brand-red/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+            <div class="max-w-full px-0 text-center relative z-10">
+                <div class="max-w-5xl mx-auto px-6">
+                    <h2 class="reveal text-brand-red text-xl font-extrabold tracking-[0.3em] uppercase mb-0 animate-pulse">MY QOUTES</h2>
+                    <div class="reveal delay-100 relative py-8 mb-16">
+                        <a class="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight relative z-10 drop-shadow-2xl">
+                            Berkarya itu abadi, <br>
+                            meski raga nanti mati.
+                        </a>
+                        <cite class="mt-8 block text-gray-400 font-medium not-italic tracking-wide flex items-center justify-center gap-4">
+                            <span class="w-12 h-[1px] bg-brand-red"></span>
+                            Febri goBLOG
+                            <span class="w-12 h-[1px] bg-brand-red"></span>
+                        </cite>
+                    </div>
+                </div>
+                <!-- Marquee Container -->
+                <div class="reveal delay-200 relative w-full overflow-hidden mask-gradient">
+                    <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-brand-surface to-transparent z-10 pointer-events-none"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-brand-surface to-transparent z-10 pointer-events-none"></div>
+                    <!-- Marquee Track -->
+                    <div class="flex w-max animate-marquee-left hover:[animation-play-state:paused] gap-2">
+                        <!-- SET 1 (Original) -->
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-2 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Tanpa musik, hidup akan menjadi sebuah kesalahan."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Apa yang tidak membunuh kita akan membuat kita lebih kuat."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Dan mereka yang terlihat menari dianggap gila oleh mereka yang tidak dapat mendengar musiknya."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Anda harus memiliki kekacauan di dalam diri Anda untuk melahirkan bintang yang menari."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Kita tidak Berbuat Jahat bukan karena ada Surga dan Neraka , tapi karena Penderitaan itu Nyata dan tidak boleh diremehkan"
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Albert Camus</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Kalian lebih suka disesatkan dari pada menjadi sesat"
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+
+                        <!-- SET 2 (Duplicate for Infinite Loop) -->
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-2 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Tanpa musik, hidup akan menjadi sebuah kesalahan."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Apa yang tidak membunuh kita akan membuat kita lebih kuat."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Dan mereka yang terlihat menari dianggap gila oleh mereka yang tidak dapat mendengar musiknya."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Anda harus memiliki kekacauan di dalam diri Anda untuk melahirkan bintang yang menari."
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Kita tidak Berbuat Jahat bukan karena ada Surga dan Neraka , tapi karena Penderitaan itu Nyata dan tidak boleh diremehkan"
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Albert Camus</span></p>
+                        </div>
+                        <div class="w-[200px] h-[250px] md:w-[400px] flex-shrink-0 p-8 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-red/50 hover:bg-white/10 transition-colors duration-300 text-left group cursor-pointer">
+                            <i data-lucide="quote" class="w-6 h-6 text-brand-red mb-4 opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            <p class="text-gray-300 font-serif italic mb-6 text-sm md:text-lg">"Kalian lebih suka disesatkan dari pada menjadi sesat"
+                            <span class="text-xs text-brand-red font-bold uppercase tracking-widest">Friedrich Nietzsche</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: GALERI FOTO (Proyek) -->
+        <section id="proyek" class="py-24 bg-black/30 overflow-hidden">
+             <div class="max-w-7xl mx-auto px-6 relative">
+                <!-- Header Section -->
+                <div class="reveal mb-12">
+                    <span class="text-brand-red text-sm font-bold tracking-widest uppercase">Visual Diary</span>
+                    <h2 class="text-4xl font-bold mt-2">Galeri Foto</h2>
+                    <p class="text-gray-500 text-sm mt-2"><i data-lucide="mouse-pointer-2" class="w-3 h-3 inline mr-1"></i> Klik foto untuk melihat detail</p>
+                </div>
+
+                <!-- Gallery Wrapper with Relative Positioning for Buttons -->
+                <div class="reveal delay-100 relative group">
+                    <!-- Tombol PREV (Kiri) -->
+                    <button onclick="scrollGallery('left')" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-brand-red border border-white/10 p-4 rounded-full text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 shadow-lg">
+                        <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                    </button>
+                    <!-- Swipe Container -->
+                    <div id="gallery-container" class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-8 hide-scrollbar scroll-smooth">
+                        <!-- Item 1 -->
+                        <div  class="cursor-pointer snap-center shrink-0 w-[85vw] md:w-[250px] md:h-[400px] h-[90vw] relative rounded-2xl overflow-hidden group/item border border-white/10 hover:border-brand-red/50 transition-colors">
+                            <img src="https://png.pngtree.com/thumb_back/fh260/background/20250120/pngtree-person-sitting-on-the-floor-in-a-dark-misty-prison-cell-image_16936995.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" alt="Street Photo">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 left-0 p-8 translate-y-4 group-hover/item:translate-y-0 transition-transform duration-300">
+                                <span class="text-brand-red text-xs font-bold uppercase tracking-wider mb-2 block">Spiritual</span>
+                                <h3 class="text-2xl font-bold text-white mb-2">self dialogue</h3>
+                                <p class="text-gray-400 text-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 delay-100">Mencari sisi Terang DIRI digemerlap malam yang Sunyi.</p>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div  class="cursor-pointer snap-center shrink-0 w-[85vw] md:w-[250px] md:h-[400px] h-[90vw] relative rounded-2xl overflow-hidden group/item border border-white/10 hover:border-brand-red/50 transition-colors">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTowIwyJPX7cgcPgFAbj0ORKhnqyOf81cZ26g&s" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" alt="Neon Night">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 left-0 p-8 translate-y-4 group-hover/item:translate-y-0 transition-transform duration-300">
+                                <span class="text-brand-red text-xs font-bold uppercase tracking-wider mb-2 block">Night Life</span>
+                                <h3 class="text-2xl font-bold text-white mb-2">smallFire</h3>
+                                <p class="text-gray-400 text-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 delay-100">Cahaya buatan yang menghidupkan malam tanpa bintang.</p>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div  class="cursor-pointer snap-center shrink-0 w-[85vw] md:w-[250px] md:h-[400px] h-[90vw] relative rounded-2xl overflow-hidden group/item border border-white/10 hover:border-brand-red/50 transition-colors">
+                            <img src="https://images.imagerenderer.com/images/artworkimages/mediumlarge/3/the-death-of-icarus-lagra-art.jpg" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" alt="Mountain">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 left-0 p-8 translate-y-4 group-hover/item:translate-y-0 transition-transform duration-300">
+                                <span class="text-brand-red text-xs font-bold uppercase tracking-wider mb-2 block">Nature</span>
+                                <h3 class="text-2xl font-bold text-white mb-2">Silent Hills</h3>
+                                <p class="text-gray-400 text-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 delay-100">Keheningan pagi di puncak bukit yang dingin.</p>
+                            </div>
+                        </div>
+                        <!-- Item 4 -->
+                        <div style="display: none;" onclick="openModal(this)" class="cursor-pointer snap-center shrink-0 w-[85vw] md:w-[250px] md:h-[400px] h-[90vw] relative rounded-2xl overflow-hidden group/item border border-white/10 hover:border-brand-red/50 transition-colors">
+                            <img src="https://images.unsplash.com/photo-1520699918507-3c3e05c46b90?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" alt="Portrait">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 left-0 p-8 translate-y-4 group-hover/item:translate-y-0 transition-transform duration-300">
+                                <span class="text-brand-red text-xs font-bold uppercase tracking-wider mb-2 block">Portrait</span>
+                                <h3 class="text-2xl font-bold text-white mb-2">The Gaze</h3>
+                                <p class="text-gray-400 text-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 delay-100">Mata adalah jendela jiwa yang tak pernah berbohong.</p>
+                            </div>
+                        </div>
+                        <!-- Item 5 -->
+                        <div class="cursor-pointer snap-center shrink-0 w-[85vw] md:w-[250px] md:h-[400px] h-[90vw] relative rounded-2xl overflow-hidden group/item border border-white/10 hover:border-brand-red/50 transition-colors">
+                            <img src="https://cdn2.unrealengine.com/feature-icarus-1920x1080-57b68e49efe4.jpg?resize=1&w=1920" class="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-110" alt="Travel">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                            <div class="absolute bottom-0 left-0 p-8 translate-y-4 group-hover/item:translate-y-0 transition-transform duration-300">
+                                <span class="text-brand-red text-xs font-bold uppercase tracking-wider mb-2 block">Travel</span>
+                                <h3 class="text-2xl font-bold text-white mb-2">Lost in Alps</h3>
+                                <p class="text-gray-400 text-sm opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 delay-100">Tersesat adalah cara terbaik menemukan diri sendiri.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tombol NEXT (Kanan) -->
+                    <button onclick="scrollGallery('right')" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-brand-red border border-white/10 p-4 rounded-full text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 shadow-lg">
+                        <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <!-- Mobile Swipe Indicator -->
+                <div class="flex md:hidden justify-center items-center gap-4 text-gray-500 text-sm mt-4 animate-pulse">
+                    <i data-lucide="move-horizontal" class="w-4 h-4"></i>
+                    <span>Geser untuk foto lain</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: VIDEO VLOG (SLIDER) -->
+        <section id="video" style="display: none;" class="py-20 px-6 max-w-7xl mx-auto">
+            <div class="reveal flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-4xl font-bold border-l-4 border-brand-red pl-4">LET'S FLY</h2>
+                    <p class="text-gray-400 text-md mt-2 ml-5">Potongan video perjalanan dan momen acak.</p>
+                </div>
+                </div>
+                <!-- Nav Buttons -->
+                <div class="flex item-center justify-center gap-8 mb-2">
+                    <button onclick="scrollContainer('vlog-slider', 'left')" class="p-3 rounded-full border border-white/20 hover:bg-brand-red hover:border-brand-red transition-all text-white">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </button>
+                    <i class="flex md:hidden justify-center text-gray-400 text-xs md:text-md lg:text-xl animate-pulse">
+                        geser ke video selanjutnya</i>
+                    <button onclick="scrollContainer('vlog-slider', 'right')" class="p-3 rounded-full border border-white/20 hover:bg-brand-red hover:border-brand-red transition-all text-white">
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Slider Container -->
+            <div id="vlog-slider" class="reveal delay-100 flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-8">
+                
+                <!-- Video 1 -->
+<div class="min-w-[85vw] md:min-w-[400px] lg:min-w-[500px] snap-center group">
+    <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5 bg-black">
+        
+        <!-- Video: Pakai w-full h-full saja agar fleksibel -->
+        <video id="video-1" 
+               onended="resetVideo('video-1', 'thumbnail-1')" 
+               onpause="resetVideo('video-1', 'thumbnail-1')" 
+               class="hidden w-full h-full object-cover" 
+               controls>
+            <source src="https://febribionille.xyz/vid/30.mp4" type="video/mp4">
+        </video>
+
+        <div id="thumbnail-1" class="absolute inset-0 block">
+            <img src="https://febribionille.xyz/IMG/REjotGIF.gif" 
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Thumbnail 1">
+            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onclick="playVideo('video-1', 'thumbnail-1')" class="bg-red-600 text-white p-3 rounded-full hover:scale-110 transition-transform cursor-pointer">
+                    <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                </button>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+                <h4 class="text-white font-bold drop-shadow-md">The Art of Storytelling</h4>
+                <p class="text-xs text-gray-300">TEDx Talks</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+            <!-- Video 2 dengan Ukuran Custom -->
+<div class="min-w-[85vw] md:min-w-[400px] lg:min-w-[500px] snap-center group">
+    <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5 bg-black">
+        
+        <!-- Video Element -->
+        <video id="video-2" 
+               onended="resetVideo('video-2', 'thumbnail-2')" 
+               onpause="resetVideo('video-2', 'thumbnail-2')" 
+               class="hidden w-full h-full object-cover" 
+               controls>
+            <source src="https://febribionille.xyz/vid/31.mp4" type="video/mp4">
+        </video>
+
+        <!-- Thumbnail Container -->
+        <div id="thumbnail-2" class="absolute inset-0 block">
+            <img src="https://febribionille.xyz/IMG/EJOT%20LOGO%20(2).png" 
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Video Thumbnail">
+            
+            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onclick="playVideo('video-2', 'thumbnail-2')" class="bg-red-600 text-white p-3 rounded-full hover:scale-110 transition-transform cursor-pointer">
+                    <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                </button>
+            </div>
+            
+            <div class="absolute bottom-4 left-4 right-4">
+                <h4 class="text-white font-bold drop-shadow-md">Cinematic Landscapes</h4>
+                <p class="text-xs text-gray-300">Nature Channel</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video 3 -->
+<div class="min-w-[85vw] md:min-w-[400px] lg:min-w-[500px] snap-center group">
+    <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5 bg-black">
+        <video id="video-3" 
+               onended="resetVideo('video-3', 'thumbnail-3')" 
+               onpause="resetVideo('video-3', 'thumbnail-3')" 
+                class="hidden w-full h-full object-cover" controls>
+            <source src="https://febribionille.xyz/vid/32.mp4" type="video/mp4">
+        </video>
+        <div id="thumbnail-3" class="absolute inset-0 block">
+            <img src="https://febribionille.xyz/IMG/EJOT%20LOGO%20(2).png"" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Thumbnail 3">
+            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onclick="playVideo('video-3', 'thumbnail-3')" class="bg-red-600 text-white p-3 rounded-full hover:scale-110 transition-transform cursor-pointer">
+                    <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                </button>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+                <h4 class="text-white font-bold drop-shadow-md">Web Development 2024</h4>
+                <p class="text-xs text-gray-300">Tech Insights</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video 4 -->
+<div class="min-w-[85vw] md:min-w-[400px] lg:min-w-[500px] snap-center group">
+    <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5 bg-black">
+        <video id="video-4" 
+               onended="resetVideo('video-4', 'thumbnail-4')" 
+               onpause="resetVideo('video-4', 'thumbnail-4')" 
+               class="hidden w-full h-full object-cover" controls>
+            <source src="https://febribionille.xyz/vid/33.mp4" type="video/mp4">
+        </video>
+        <div id="thumbnail-4" class="absolute inset-0 block">
+            <img src="https://febribionille.xyz/IMG/EJOT%20LOGO%20(2).png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Thumbnail 4">
+            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onclick="playVideo('video-4', 'thumbnail-4')" class="bg-red-600 text-white p-3 rounded-full hover:scale-110 transition-transform cursor-pointer">
+                    <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                </button>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+                <h4 class="text-white font-bold drop-shadow-md">Retro Gaming Culture</h4>
+                <p class="text-xs text-gray-300">Gaming History</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video 5 -->
+<div class="min-w-[85vw] md:min-w-[400px] lg:min-w-[500px] snap-center group">
+    <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5 bg-black">
+        <video id="video-5" 
+               onended="resetVideo('video-5', 'thumbnail-5')" 
+               onpause="resetVideo('video-5', 'thumbnail-5')" 
+               class="hidden w-full h-full object-cover" controls>
+            <source src="https://febribionille.xyz/vid/34.mp4" type="video/mp4">
+        </video>
+        <div id="thumbnail-5" class="absolute inset-0 block">
+            <img src="https://febribionille.xyz/IMG/EJOT%20LOGO%20(2).png" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Thumbnail 5">
+            <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <button onclick="playVideo('video-5', 'thumbnail-5')" class="bg-red-600 text-white p-3 rounded-full hover:scale-110 transition-transform cursor-pointer">
+                    <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                </button>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+                <h4 class="text-white font-bold drop-shadow-md">Space Exploration</h4>
+                <p class="text-xs text-gray-300">Cosmos Daily</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+            </div>
+        </section>
+
+        <!-- SECTION: MY FAVORITES (NEW POSITION) -->
+        <section id="favorites" class="py-24 bg-black relative">
+             <div class="max-w-7xl mx-auto px-6">
+                <div class="reveal flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-brand-red text-sm font-bold tracking-widest ">Its make me CraZy</span>
+                        <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mt-2 uppercase">My Favorite Content</h2>
+                    </div>
+                    <div class="h-[1px] bg-white/20 flex-1 ml-8 hidden md:block"></div>
+                </div>
+
+                <!-- Bento Grid Layout -->
+                <div class="reveal delay-100 grid grid-cols-1 md:grid-cols-4 gap-6">
+                    
+                    <!-- 1. LAGU FAVORIT (On Repeat) - Large Block -->
+                    <div class="md:col-span-2 bg-brand-surface rounded-3xl p-6 border border-white/10 hover:border-brand-red/50 transition-colors flex flex-col justify-between group">
+                        <!-- ... content same as before ... -->
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="flex items-center gap-2 text-brand-red">
+                                <i data-lucide="music" class="w-5 h-5"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Lagu</span>
+                            </div>
+                            <i data-lucide="bar-chart-2" class="w-6 h-6 text-gray-500 group-hover:text-brand-red transition-colors"></i>
+                        </div>
+                        
+                       <!-- Song List -->
+                        <div class="space-y-4">
+                            <!-- LAGU 1: SENJATA BARU -->
+                            <div onclick="playMusic('https://febribionille.xyz/senjatabaru.mp3', 'btn-audio-1', 'SENJATA BARU', 'SUPERIOTS', 'https://febribionille.xyz/IMG/VEKTOR%20NEW%20LOGO%20(1)PNG.png')" class="flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer relative group/item">
+                                <img src="https://yt3.googleusercontent.com/Mc0AFGeApr_yR10En0ou1C_qhjoLi9yUA8dD2TFYGX5JD7omG40ywiQY1wCfbuL8f7sdeVYF=s900-c-k-c0x00ffffff-no-rj" class="w-12 h-12 rounded-lg object-cover bg-black" alt="Album Art">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-brand-red group-hover/item:text-white uppercase transition-colors">SENJATA BARU</h4>
+                                    <p class="text-xs text-gray-400">SUPERIOTS</p>
+                                </div>
+                                <div id="btn-audio-1" class="bg-black/50 p-2 rounded-full group-hover/item:bg-brand-red transition-colors">
+                                    <i data-lucide="play" class="w-4 h-4 text-white block icon-play fill-current"></i>
+                                    <i data-lucide="pause" class="w-4 h-4 text-white hidden icon-pause fill-current"></i>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-0.5 bg-brand-red w-0 transition-all duration-500 group-hover/item:w-full"></div>
+                            </div>
+
+                            <!-- LAGU 2: JEJE - LIHAT KEBUNKU -->
+                            <div onclick="playMusic('https://febribionille.xyz/lihatkebunku.mp3', 'btn-audio-2', 'Dj Natal', 'Febri Bionille', 'https://febribionille.xyz/IMG/VEKTOR%20NEW%20LOGO%20(1)PNG.png')" class="flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer relative group/item">
+                                <img src="https://yt3.googleusercontent.com/n-rUcWeGVF-s1h7Fj5CrzAkRm0h5B2mYvZ_RNWpCavpDiuKogLmKhNHmwYW0-I_ip4KFL5IhUg=s160-c-k-c0x00ffffff-no-rj" class="w-12 h-12 rounded-lg object-cover bg-black" alt="Album Art">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-brand-red group-hover/item:text-white uppercase transition-colors">Lihat Kebunku</h4>
+                                    <p class="text-xs text-gray-400">Aku JEJE</p>
+                                </div>
+                                <div id="btn-audio-2" class="bg-black/50 p-2 rounded-full group-hover/item:bg-brand-red transition-colors">
+                                    <i data-lucide="play" class="w-4 h-4 text-white block icon-play fill-current"></i>
+                                    <i data-lucide="pause" class="w-4 h-4 text-white hidden icon-pause fill-current"></i>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-0.5 bg-brand-red w-0 transition-all duration-500 group-hover/item:w-full"></div>
+                            </div>
+
+                            <!-- LAGU 3: AKU DAN BINTANG (BARU) -->
+                            <div onclick="playMusic('https://febribionille.xyz/aku&bintang.mp3', 'btn-audio-3', 'Aku dan Bintang', 'NOAH', 'https://febribionille.xyz/IMG/VEKTOR%20NEW%20LOGO%20(1)PNG.png')" class="flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer relative group/item">
+                                <img src="https://i.ytimg.com/vi/yBKXg9LpHgw/maxresdefault.jpg" class="w-12 h-12 rounded-lg object-cover bg-black" alt="Album Art">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-brand-red group-hover/item:text-white uppercase transition-colors">Aku dan Bintang</h4>
+                                    <p class="text-xs text-gray-400">NOAH</p>
+                                </div>
+                                <div id="btn-audio-3" class="bg-black/50 p-2 rounded-full group-hover/item:bg-brand-red transition-colors">
+                                    <i data-lucide="play" class="w-4 h-4 text-white block icon-play fill-current"></i>
+                                    <i data-lucide="pause" class="w-4 h-4 text-white hidden icon-pause fill-current"></i>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-0.5 bg-brand-red w-0 transition-all duration-500 group-hover/item:w-full"></div>
+                            </div>
+
+                            <!-- LAGU 4: HIDUP UNTUKMU, MATI TANPAMU (BARU) -->
+                            <div onclick="playMusic('https://febribionille.xyz/hidupumu-matitmu.mp3', 'btn-audio-4', 'Hidup Untukmu, Mati Tanpamu', 'NOAH', 'https://febribionille.xyz/IMG/VEKTOR%20NEW%20LOGO%20(1)PNG.png')" class="flex items-center gap-4 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer relative group/item">
+                                <img src="http://103.210.105.78/thumbnail/fit/4d9ca942-b58e-48eb-8b95-3d27540200b6/1920/1080" class="w-12 h-12 rounded-lg object-cover bg-black" alt="Album Art">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-brand-red group-hover/item:text-white uppercase transition-colors">Hidup Untukmu, Mati Tanpamu</h4>
+                                    <p class="text-xs text-gray-400">NOAH</p>
+                                </div>
+                                <div id="btn-audio-4" class="bg-black/50 p-2 rounded-full group-hover/item:bg-brand-red transition-colors">
+                                    <i data-lucide="play" class="w-4 h-4 text-white block icon-play fill-current"></i>
+                                    <i data-lucide="pause" class="w-4 h-4 text-white hidden icon-pause fill-current"></i>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-0.5 bg-brand-red w-0 transition-all duration-500 group-hover/item:w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2. BUKU FAVORIT (Slider) - Updated -->
+                    <div class="md:col-span-1 bg-brand-surface rounded-3xl border border-white/10 hover:border-brand-red/50 transition-colors group relative overflow-hidden flex flex-col">
+                        <!-- Decorative Blob -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-red/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                        
+                        <!-- Header with Controls -->
+                        <div class="flex items-center justify-between p-6 pb-2 relative z-10">
+                            <div class="flex items-center gap-2 text-brand-red">
+                                <i data-lucide="book-open" class="w-5 h-5"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Buku</span>
+                            </div>
+                            <!-- Nav Buttons -->
+                            <div class="flex gap-1">
+                                <button onclick="scrollContainer('books-slider', 'left')" class="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button onclick="scrollContainer('books-slider', 'right')" class="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Container -->
+                        <div id="books-slider" class="flex-1 flex overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-6 px-6 items-center">
+                            
+                            <!-- Book 1 -->
+                            <div class="min-w-full snap-center flex flex-col items-center text-center relative z-10 transition-opacity duration-300">
+                                <img src="https://bpkgunungmulia.com/cdn/shop/products/1667801943693171960_a4e208c1-8cf5-4772-b53b-6a54a831bb2e.jpg?v=1706081410&width=1445" class="w-32 h-48 object-cover rounded shadow-lg mb-4 transform group-hover:scale-105 transition-transform duration-300" alt="Book Cover">
+                                <h4 class="font-bold text-white">ALKITAB</h4>
+                                <p class="text-xs text-gray-400 mt-1">_</p>
+                                <div class="mt-4 flex gap-1 justify-center">
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                </div>
+                            </div>
+
+                            <!-- Book 2 -->
+                            <div class="min-w-full snap-center flex flex-col items-center text-center relative z-10 transition-opacity duration-300">
+                                <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=200&auto=format&fit=crop" class="w-32 h-48 object-cover rounded shadow-lg mb-4 transform group-hover:scale-105 transition-transform duration-300" alt="Book Cover 2">
+                                <h4 class="font-bold text-white">Atomic Habits</h4>
+                                <p class="text-xs text-gray-400 mt-1">James Clear</p>
+                                <div class="mt-4 flex gap-1 justify-center">
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-yellow-500"></i>
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        <!-- Mobile Hint -->
+                        <div class="absolute bottom-2 left-0 right-0 text-center md:hidden">
+                            <span class="text-[10px] text-gray-700 animate-pulse">Swipe</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. FILSUF & PENULIS -->
+                    <div class="md:col-span-1 bg-brand-surface rounded-3xl p-6 border border-white/10 hover:border-brand-red/50 transition-colors">
+                        <div class="flex items-center gap-2 text-brand-red mb-6">
+                            <i data-lucide="feather" class="w-5 h-5"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Inspirator</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <a href="https://en.wikipedia.org/wiki/Friedrich_Nietzsche" target="_blank" class="flex items-center gap-3 group/author">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Nietzsche187a.jpg/500px-Nietzsche187a.jpg?q=80&w=100&auto=format&fit=crop" class="w-10 h-10 rounded-full object-cover grayscale" alt="Filsuf">
+                                <div>
+                                    <p class="text-sm font-bold">Friedrich Nietzsche</p>
+                                    <p class="text-[10px] text-brand-red uppercase">Filsuf</p>
+                                </div>
+                                </a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG_1icQjKM9owC31PcsV94QNBqOTAXQ5fG8edWhCVTLBureQvwBmVi7Y4YKWwBsCSIC3J2Vh-Zgx-_Wvi2uXaVi6O8TdTYjZNjgiQfIw&s=10" class="w-10 h-10 rounded-full object-cover grayscale" alt="Penulis">
+                                <div>
+                                    <a href="https://id.wikipedia.org/wiki/Sokrates" target="_blank" class="group/author">
+                                    <p class="text-sm font-bold">Sokrates</p>
+                                    <p class="text-[10px] text-brand-red uppercase">Penulis</p>
+                                </div>
+                            </a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <a href="https://en.wikipedia.org/wiki/Albert_Camus" target="_blank" class="flex items-center gap-3 group/author">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Albert_Camus%2C_gagnant_de_prix_Nobel%2C_portrait_en_buste%2C_pos%C3%A9_au_bureau%2C_faisant_face_%C3%A0_gauche%2C_cigarette_de_tabagisme.jpg/500px-Albert_Camus%2C_gagnant_de_prix_Nobel%2C_portrait_en_buste%2C_pos%C3%A9_au_bureau%2C_faisant_face_%C3%A0_gauche%2C_cigarette_de_tabagisme.jpg?q=80&w=100&auto=format&fit=crop" class="w-10 h-10 rounded-full object-cover grayscale" alt="Penulis">
+                                <div>
+                                    <p class="text-sm font-bold">Albert Camus</p>
+                                    <p class="text-[10px] text-brand-red uppercase">Filsuf</p>
+                                </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. VIDEO FAVORIT (Slider) - Updated -->
+                    <div class="md:col-span-2 bg-brand-surface rounded-3xl border border-white/10 hover:border-brand-red/50 transition-colors group relative overflow-hidden flex flex-col p-6">
+                        <!-- Header with Controls -->
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <div class="flex items-center gap-2 text-brand-red">
+                                <i data-lucide="film" class="w-5 h-5"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Top Video</span>
+                            </div>
+                            <!-- Nav Buttons -->
+                            <div class="flex gap-1">
+                                <button onclick="scrollContainer('videos-slider', 'left')" class="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button onclick="scrollContainer('videos-slider', 'right')" class="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-all"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Container -->
+                        <div id="videos-slider" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-4">
+                            
+                            <!-- Video 1 -->
+                            <div class="min-w-full snap-center">
+                                <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5">
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/GiV4RCVXEPk?si=KkKA31hffrfXL_tU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <div class="mt-4 px-2 text-center ">
+                       <a href="https://youtu.be/GiV4RCVXEPk?si=s3r4ErZebKvNjPZW" target="_blank" class="text-brand-red text-sm md:text-md lg:text-lg hover:text-white font-extrabold uppercase tracking-wider">
+                            Putar di YOUTUBE</a>
+                    </div>
+                </div>
+
+                            <!-- Video 2 -->
+                            <div class="min-w-full snap-center">
+                                <div class="relative rounded-xl overflow-hidden aspect-video border border-white/5">
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/gidT6saW_ks?si=Egw_oa8j8uPPikLn" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <div class="mt-4 px-2 text-center ">
+                       <a href="https://youtu.be/gidT6saW_ks?si=cZ-svtRYl7TcROSI" target="_blank" class="text-brand-red text-sm md:text-md lg:text-lg hover:text-white font-extrabold uppercase tracking-wider">
+                            Putar di YOUTUBE</a>
+                    </div>
+                </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. KREATOR FAVORIT -->
+                    <div style="display: none;" class="md:col-span-2 bg-brand-surface rounded-3xl p-6 border border-white/10 hover:border-brand-red/50 transition-colors">
+                        <!-- ... content same as before ... -->
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-2 text-brand-red">
+                                <i data-lucide="youtube" class="w-5 h-5"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Kreator Favorit</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors group/creator">
+                                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-transparent group-hover/creator:border-brand-red transition-colors" alt="Creator">
+                                <p class="text-xs font-bold">Casey Neistat</p>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors group/creator">
+                                <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-transparent group-hover/creator:border-brand-red transition-colors" alt="Creator">
+                                <p class="text-xs font-bold">MKBHD</p>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors group/creator">
+                                <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-transparent group-hover/creator:border-brand-red transition-colors" alt="Creator">
+                                <p class="text-xs font-bold">Veritasium</p>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors group/creator">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&auto=format&fit=crop" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-transparent group-hover/creator:border-brand-red transition-colors" alt="Creator">
+                                <p class="text-xs font-bold">Agung Hapsah</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+             </div>
+        </section>
+
+        <!-- FOOTER (UPDATED) -->
+        <footer id="tentang" class="bg-black border-t border-white/10 pt-16 pb-8 reveal">
+            <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                
+                <!-- Kolom 1: Tentang -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Tentang<span class="font-normal text-xs text-gray-200"> aku</span></h3>
+                    <p class="text-gray-400 leading-relaxed mb-6 text-sm">
+                        "   Dalam dunia yang terus berubah, saya percaya bahwa 
+                            kemampuan untuk belajar dan beradaptasi adalah kunci untuk 
+                            bertahan dan berkembang. <br>
+                            Saya adalah seorang pembelajar yang haus akan pengetahuan baru.
+                            Setiap baris kode yang saya tulis adalah bagian dari perjalanan 
+                            saya untuk memahami dunia digital yang kompleks ini.<br>
+                            Bagi saya,teknologi membantu kita berlari lebih cepat, namun terkadang muncul 
+                            pertanyaan untuk apa mengejar semua ini.<br>
+                             Halaman ini adalah dokumentasi perjalanan
+                            saya dalam mengejar ketenangan hidup dan memahami kompleksitas dunia digital. 
+                            Selamat datang di catatan perjalanan saya."
+                    </p>
+                    <div class="flex items-center gap-2 text-brand-red mb-2">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span class="text-sm font-semibold">LANDAK,KALIMANTAN BARAT</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-brand-red">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <a href="mailto:info@febribionille.xyz" class="text-sm font-semibold hover:text-white transition-colors">
+                        <span class="text-sm font-semibold">CHAT EMAIL</span></a>
+                    </div>
+                    <div class="flex items-center gap-2 text-brand-red mt-2">
+                        <i data-lucide="messages-square" class="w-4 h-4"></i>
+                        <a target="_blank" href="https://api.whatsapp.com/send/?phone=62895411712108&text=Halo+King+Ejot%2C+saya+menemukan+kontak+Anda+dari+website+portfolio.&type=phone_number&app_absent=0" class="text-sm font-semibold hover:text-white transition-colors">
+                        <span class="text-sm font-semibold">CHAT WHATSAPP</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Kolom 2: Menu Cepat -->
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-6 border-l-4 border-brand-red pl-1">Menu Cepat</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#home" class="text-gray-400 hover:text-white hover:translate-x-2 transition-all inline-block">Beranda</a></li>
+                        <li><a href="#tulisan" class="text-gray-400 hover:text-white hover:translate-x-2 transition-all inline-block">Tulisan Terbaru</a></li>
+                        <li><a href="#quotes" class="text-gray-400 hover:text-white hover:translate-x-2 transition-all inline-block">Kata Mutiara</a></li>
+                        <li><a href="#favorites" class="text-gray-400 hover:text-white hover:translate-x-2 transition-all inline-block">Favorit Saya</a></li>
+                        <li><a href="#proyek" class="text-gray-400 hover:text-white hover:translate-x-2 transition-all inline-block">Galeri Foto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kolom 3: Sosial Media -->
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-6 border-l-4 border-brand-red pl-3">Terhubung</h3>
+                    <div class="flex flex-col space-y-4">
+                        <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-brand-red transition-colors group">
+                            <div class="bg-white/5 p-2.5 rounded-full group-hover:bg-white/10 transition-colors border border-white/5">
+                                <i data-lucide="instagram" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-sm font-medium">Instagram</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-brand-red transition-colors group">
+                            <div class="bg-white/5 p-2.5 rounded-full group-hover:bg-white/10 transition-colors border border-white/5">
+                                <i data-lucide="twitter" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-sm font-medium">Twitter / X</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-brand-red transition-colors group">
+                            <div class="bg-white/5 p-2.5 rounded-full group-hover:bg-white/10 transition-colors border border-white/5">
+                                <i data-lucide="github" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-sm font-medium">Github</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-brand-red transition-colors group">
+                            <div class="bg-white/5 p-2.5 rounded-full group-hover:bg-white/10 transition-colors border border-white/5">
+                                <i data-lucide="linkedin" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-sm font-medium">LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600">
+                <p>© 2026 Febri goBLOG.  <span class="text-brand-red">❤</span></p>
+                <div style="display: none;" class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-gray-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-gray-400 transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-gray-400 transition-colors">Sitemap</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+    
+    <!-- MODAL POPUP DETAIL (Hidden by default) -->
+    <div id="image-modal" class="fixed inset-0 z-[120] hidden opacity-0 transition-opacity duration-300" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/95 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-0 md:p-4 text-center">
+                <!-- Modal Panel -->
+                <div class="relative transform overflow-hidden bg-brand-surface text-left shadow-2xl transition-all w-full h-screen md:h-auto md:rounded-2xl md:max-w-5xl md:border md:border-white/10 flex flex-col md:flex-row">
+                    <!-- Close Button -->
+                    <button onclick="closeModal()" class="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-brand-red transition-colors border border-white/10">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                    <!-- Image Side -->
+                    <div class="w-full md:w-3/5 h-[40vh] md:h-auto bg-gray-900 relative group">
+                         <img id="modal-img" src="" alt="Detail" class="w-full h-full object-cover">
+                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent md:hidden"></div>
+                    </div>
+                    <!-- Content Side -->
+                    <div class="w-full md:w-2/5 p-8 md:p-10 flex flex-col h-[60vh] md:h-auto overflow-y-auto bg-brand-surface">
+                        <div class="flex-1">
+                            <span id="modal-category" class="text-brand-red text-xs font-bold uppercase tracking-wider mb-4 block">Category</span>
+                            <h3 id="modal-title" class="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">Title</h3>
+                            <!-- Main Description / Excerpt -->
+                            <p id="modal-desc" class="text-xl text-gray-200 font-medium mb-6 leading-relaxed italic border-l-4 border-brand-red pl-4">Description</p>
+                            
+                            <!-- Additional Full Content (Detail Tulisan) -->
+                            <div id="modal-body" class="prose prose-invert prose-sm max-w-none text-gray-400 space-y-4">
+                                <!-- Content injected via JS -->
+                            </div>
+                        </div>
+                        <!-- Meta Info Footer -->
+                        <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-gray-500">
+                            <div class="flex items-center gap-2 text-sm">
+                                <i data-lucide="calendar" class="w-4 h-4 text-brand-red"></i>
+                                <span id="modal-date">15 Feb 2026</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <i data-lucide="user" class="w-4 h-4 text-brand-red"></i>
+                                <span>Febri</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Dasar -->
+    <script>
+        lucide.createIcons();
+
+        // 1. SCROLL ANIMATION OBSERVER
+        const observerOptions = {
+            threshold: 0.1, // Trigger when 10% of element is visible
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Optional: stop observing once revealed
+                    // observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconClose = document.getElementById('icon-close');
+            const body = document.body;
+            
+            const isClosed = menu.classList.contains('translate-x-full');
+            
+            if (isClosed) {
+                menu.classList.remove('translate-x-full');
+                iconMenu.classList.add('hidden');
+                iconMenu.classList.remove('block');
+                iconClose.classList.remove('hidden');
+                iconClose.classList.add('block');
+                body.classList.add('overflow-hidden');
+            } else {
+                menu.classList.add('translate-x-full');
+                iconMenu.classList.remove('hidden');
+                iconMenu.classList.add('block');
+                iconClose.classList.add('hidden');
+                iconClose.classList.remove('block');
+                body.classList.remove('overflow-hidden');
+            }
+        }
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-black/90', 'shadow-lg');
+                nav.classList.remove('bg-transparent');
+            } else {
+                nav.classList.remove('bg-black/90', 'shadow-lg');
+                nav.classList.add('bg-transparent');
+            }
+        });
+
+        // Gallery Scroll Function (Main Gallery)
+        function scrollGallery(direction) {
+            const container = document.getElementById('gallery-container');
+            const scrollAmount = 420; 
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // NEW: Generic Scroll Function for Favorites (Books/Videos)
+        function scrollContainer(id, direction) {
+            const container = document.getElementById(id);
+            if (!container) return;
+
+            // Get width of first child card to scroll accurately
+            const card = container.firstElementChild;
+            let scrollAmount = container.clientWidth; // Fallback
+
+            if (card) {
+                const gap = 24; // Tailwind gap-6 is 1.5rem = 24px
+                scrollAmount = card.offsetWidth + gap;
+            }
+            
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // --- AUDIO PLAYER LOGIC ---
+        let currentAudio = null;
+        let currentButtonId = null;
+
+        function playMusic(url, buttonId) {
+            const btnContainer = document.getElementById(buttonId);
+            if (!btnContainer) return;
+
+            const playIcon = btnContainer.querySelector('.icon-play');
+            const pauseIcon = btnContainer.querySelector('.icon-pause');
+
+            if (currentAudio && currentAudio.src === url) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                } else {
+                    currentAudio.pause();
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                }
+            } else {
+                // Stop previous audio if playing
+                if (currentAudio) {
+                    currentAudio.pause();
+                    // Reset previous button state
+                    if (currentButtonId) {
+                        const prevBtn = document.getElementById(currentButtonId);
+                        if(prevBtn) {
+                            prevBtn.querySelector('.icon-play').classList.remove('hidden');
+                            prevBtn.querySelector('.icon-pause').classList.add('hidden');
+                        }
+                    }
+                }
+
+                currentAudio = new Audio(url);
+                currentAudio.play();
+                currentButtonId = buttonId;
+
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+
+                currentAudio.onended = () => {
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                };
+            }
+        }
+
+        // --- MODAL POPUP LOGIC FOR GALLERY ---
+        function openModal(element) {
+            const modal = document.getElementById('image-modal');
+            const imgSrc = element.querySelector('img').src;
+            const category = element.querySelector('span').innerText;
+            const title = element.querySelector('h3').innerText;
+            const desc = element.querySelector('p').innerText;
+
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('modal-category').innerText = category;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            
+            // Default generic content for gallery items
+            const modalBody = document.getElementById('modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <p>Di balik setiap foto, selalu ada cerita yang tak terucapkan. Momen ini direkam bukan hanya untuk keindahan visual semata, tetapi sebagai pengingat akan perasaan yang hadir saat rana kamera ditekan.</p>
+                    <p>Fotografi bagi saya adalah sebuah jeda. Sebuah cara untuk menghentikan waktu barang sejenak, menarik napas, dan menghargai detail-detail kecil kehidupan.</p>
+                `;
+            }
+            
+            // Clear date if exists
+            const modalDate = document.getElementById('modal-date');
+            if (modalDate) modalDate.innerText = 'Gallery Item';
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+                modal.querySelector('.transform').classList.add('scale-100');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        // --- NEW: MODAL POPUP LOGIC FOR ARTICLES ---
+        function openArticleModal(element) {
+            const modal = document.getElementById('image-modal');
+            
+            // Data extraction tailored for Blog Card structure
+            const imgSrc = element.querySelector('img').src;
+            // Category is in absolute div
+            const category = element.querySelector('.absolute').innerText;
+            const title = element.querySelector('h3').innerText;
+            // Date is the first p in p-6 div
+            const date = element.querySelector('.p-6 p').innerText;
+            // Excerpt is the p with line-clamp
+            const excerpt = element.querySelector('.line-clamp-3').innerText;
+            // Full content hidden div
+            const fullContent = element.querySelector('.full-content').innerHTML;
+
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('modal-category').innerText = category;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = excerpt; // Use excerpt as lead text
+            document.getElementById('modal-body').innerHTML = fullContent; // Inject full HTML
+            
+            const modalDate = document.getElementById('modal-date');
+            if (modalDate) modalDate.innerText = date;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+                modal.querySelector('.transform').classList.add('scale-100');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.add('scale-95');
+            modal.querySelector('.transform').classList.remove('scale-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = 'auto';
+        }
+
+       /* --- TYPEWRITER EFFECT --- */
+        const textElement = document.getElementById('typewriter');
+        const phrases = ['Aku Penasaran.','Aku Bertanya.','Aku Belajar.','Aku Menulis.','Aku Berbagi.','Aku Refleksi.','Aku Berkembang.','Aku Berproses.','Aku Berubah.','AKU BISA.'];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 100;
+
+        function type() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                textElement.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+                typeSpeed = 50;
+            } else {
+                textElement.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+                typeSpeed = 100;
+            }
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                isDeleting = true;
+                typeSpeed = 2000; // Pause at end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 500; // Pause before new word
+            }
+
+            setTimeout(type, typeSpeed);
+        }
+        document.addEventListener('DOMContentLoaded', type);
+
+                        /* --- VIDEO FAVORITE --- */
+
+        function playVideo(videoId, thumbnailId) {
+    const video = document.getElementById(videoId);
+    const thumbnail = document.getElementById(thumbnailId);
+
+    video.classList.remove('hidden');
+    thumbnail.classList.replace('block', 'hidden');
+    video.play();
+}
+
+function resetVideo(videoId, thumbnailId) {
+    const video = document.getElementById(videoId);
+    const thumbnail = document.getElementById(thumbnailId);
+
+    // Cek jika video tidak sedang dalam proses transisi
+    if (!video.classList.contains('hidden')) {
+        video.pause(); // Pastikan video berhenti
+        video.classList.add('hidden');
+        thumbnail.classList.replace('hidden', 'block');
+        
+        // Opsional: kembalikan durasi ke awal jika ingin video reset total
+        // video.currentTime = 0;
+    }
+
+    // Refresh icon Lucide jika diperlukan
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
+    </script>
+</body>
+</html>
