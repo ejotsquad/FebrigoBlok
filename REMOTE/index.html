@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EJOT_REMOTE - Eksperimen</title>
+    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhbvumD0DYBFT3r2Uf6riCsKfNxfMDYoddPA2Kgn8QAI9U9B66-sxgXQxg9_j-XaGszGwHElK75Z5dhF98MLJyR8T0Dk5LsXxShxib3KVfcx6FYxKUlQW26EBkPw1vEJ9swcVRUIC6aSgjLrNU5cFF6eBM_Si9ox0LOlmx3Vye4V079-rCDgiqB7IhzvbDp/s400/EJOT%20LOGO%20%28HD%29.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Google Sans', sans-serif; background-color: #131314; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Material You Card Transitions */
+        .ghome-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .ghome-card:active { transform: scale(0.96); }
+
+        /* Custom Colors for Material You Dark */
+        .bg-surface { background-color: #282a2c; }
+        .bg-surface-variant { background-color: #444746; }
+        .text-on-surface { color: #e3e3e3; }
+        .text-on-surface-variant { color: #c4c7c5; }
+        
+        /* Active States */
+        .bg-active-green { background-color: #c4eed0; }
+        .text-on-active-green { color: #0f5223; }
+        .bg-active-green-icon { background-color: #0f5223; }
+        .text-active-green-icon { color: #c4eed0; }
+
+        .bg-active-red { background-color: #f2b8b5; }
+        .text-on-active-red { color: #8c1d18; }
+        .bg-active-red-icon { background-color: #8c1d18; }
+        .text-active-red-icon { color: #f2b8b5; }
+        
+        select option { background-color: #282a2c; color: #e3e3e3; }
+        
+        /* Area aman untuk Bottom Nav di iPhone/HP modern */
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+    </style>
+</head>
+<body class="text-on-surface min-h-screen flex flex-col p-4 sm:p-6 lg:p-8 antialiased max-w-7xl mx-auto relative">
+
+    <!-- LOGIN VIEW -->
+    <div id="login-view" class="flex-1 flex items-center justify-center z-50">
+        <div class="bg-surface border border-surface-variant/50 rounded-[32px] p-8 w-full max-w-sm text-center shadow-xl">
+            <div class="w-16 h-16 rounded-full bg-emerald-900/30 flex items-center justify-center mx-auto mb-5 border border-emerald-500/30">
+                <i data-lucide="lock" class="w-7 h-7 text-emerald-400"></i>
+            </div>
+            <h2 class="text-2xl font-medium mb-2 text-on-surface">Akses Terkunci</h2>
+            <p class="text-sm text-on-surface-variant mb-8">Masukkan PIN keamanan (8 Karakter)</p>
+            
+            <input type="password" id="login-pin" placeholder="••••••" class="w-full bg-surface-variant/30 text-on-surface text-center text-2xl tracking-[0.5em] rounded-2xl py-4 mb-4 outline-none focus:bg-surface-variant/60 border border-transparent focus:border-emerald-500/50 transition-all" onkeypress="handleLoginKeyPress(event)">
+            <p id="login-error" class="text-xs text-rose-400 font-medium mb-4 hidden">PIN yang Anda masukkan salah!</p>
+            
+            <button id="btn-login-submit" onclick="checkLogin()" class="w-full py-4 rounded-2xl text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex justify-center items-center gap-2">
+                <span>Buka Panel</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboard-view" class="hidden flex-col flex-1 w-full relative">
+        <!-- Header Google Home Style -->
+        <header class="flex justify-between items-center mb-6 mt-2">
+            <h1 class="text-2xl sm:text-3xl font-medium tracking-tight">Rumah (Eksperimen)</h1>
+            <div class="flex gap-2">
+                <button onclick="toggleEditMode()" id="btn-edit-mode" title="Edit Tombol" class="w-10 h-10 sm:w-12 sm:h-12 bg-surface hover:bg-surface-variant/80 text-on-surface-variant transition-colors rounded-full flex items-center justify-center shadow-sm border border-surface-variant/50">
+                    <i data-lucide="edit-3" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </button>
+                <button onclick="logout()" title="Keluar / Logout" class="w-10 h-10 sm:w-12 sm:h-12 bg-surface hover:bg-surface-variant/80 transition-colors rounded-full flex items-center justify-center shadow-sm border border-surface-variant/50">
+                    <i data-lucide="log-out" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface-variant"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Top Panel: Status Bar & Activity Log (Smartphone Style) -->
+        <div class="mb-6 bg-surface rounded-[28px] p-4 sm:p-5 h-56 sm:h-64 flex flex-col border border-surface-variant/50 relative overflow-hidden shadow-sm">
+            
+            <!-- Status Bar (Scrollable Pills Horizontal) -->
+            <div class="flex overflow-x-auto no-scrollbar flex-nowrap gap-2 pb-4 mb-4 border-b border-surface-variant/30 shrink-0">
+                <!-- Device Selector Pill -->
+                <div class="bg-surface rounded-full px-4 py-2 flex items-center gap-2 border border-surface-variant/50 focus-within:border-emerald-500 transition-colors shrink-0">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+                    <select id="device-select" onchange="changeDevice(this.value)" class="bg-transparent text-sm font-medium outline-none cursor-pointer appearance-none max-w-[100px] sm:max-w-[150px] truncate">
+                        <option value="">Memuat...</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-on-surface-variant"></i>
+                </div>
+
+                <!-- Connection Status Pill -->
+                <div id="conn-pill" class="bg-amber-900/30 text-amber-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors shrink-0">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                    <span id="status-text">Menghubungkan...</span>
+                </div>
+
+                <!-- Heartbeat Status Pill -->
+                <div id="hp-pill" class="bg-surface text-on-surface-variant rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors hidden sm:flex shrink-0 border border-surface-variant/50">
+                    <span class="relative flex h-2 w-2">
+                        <span id="hp-ping" class="absolute inline-flex h-full w-full rounded-full bg-slate-500 opacity-75"></span>
+                        <span id="hp-dot" class="relative inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
+                    </span>
+                    <span id="hp-status-text">Mencari HP...</span>
+                </div>
+
+                <!-- PILL: Baterai & Cas -->
+                <div id="battery-pill" class="bg-surface text-on-surface-variant rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-surface-variant/50">
+                    <div id="battery-icon-container" class="flex items-center justify-center">
+                        <i data-lucide="battery" class="w-4 h-4"></i>
+                    </div>
+                    <span id="battery-text">Baterai: --%</span>
+                </div>
+
+                <!-- PILL: Status GPS -->
+                <div id="gps-pill" class="bg-surface text-on-surface-variant rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-surface-variant/50">
+                    <div id="gps-icon-container" class="flex items-center justify-center">
+                        <i data-lucide="map-pin-off" class="w-4 h-4"></i>
+                    </div>
+                    <span id="gps-text">GPS: --</span>
+                </div>
+
+                <!-- PILL: Aplikasi Aktif (Interactive) -->
+                <button onclick="refreshCurrentApp()" class="bg-surface hover:bg-surface-variant/50 text-indigo-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer select-none focus:outline-none active:scale-95 border border-surface-variant/50 shrink-0">
+                    <i id="refresh-app-icon" data-lucide="layout-grid" class="w-4 h-4"></i>
+                    <span id="active-app-text" class="truncate max-w-[100px] sm:max-w-[150px]">Memuat...</span>
+                </button>
+
+                <!-- PILL: Cek Sinkronisasi (Clickable) -->
+                <button onclick="checkStatus()" class="bg-surface hover:bg-surface-variant/50 text-on-surface rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-pointer select-none focus:outline-none active:scale-95 border border-surface-variant/50 shrink-0">
+                    <i data-lucide="refresh-cw" class="w-4 h-4 text-on-surface-variant"></i>
+                    <span>Sinkronisasi</span>
+                </button>
+            </div>
+
+            <!-- Activity Log Section -->
+            <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2 flex items-center justify-between shrink-0">
+                <span>Riwayat Aktivitas</span>
+                <i data-lucide="activity" class="w-4 h-4 opacity-50"></i>
+            </h3>
+            <div class="relative flex-1 flex flex-col overflow-hidden">
+                <!-- Fade effect for scroll -->
+                <div class="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-surface to-transparent pointer-events-none z-10"></div>
+                <div class="flex-1 overflow-y-auto no-scrollbar font-mono text-[11px] sm:text-xs flex flex-col justify-end gap-1.5 pb-1" id="activity-log">
+                    <div class="text-on-surface-variant">>> Menunggu sistem siap...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid Layout (Memberikan padding-bottom ekstra di HP agar tidak tertutup nav bar) -->
+        <main class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 flex-1 content-start pb-24 md:pb-4">
+            
+            <!-- TAB 1: BERANDA -->
+            <div id="tab-beranda" class="contents">
+                <!-- CARD: Kunci Android -->
+                <div id="card-kunci" onclick="toggleDevice()" class="ghome-card bg-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30">
+                    <div id="icon-bg-kunci" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors">
+                        <i id="icon-kunci" data-lucide="smartphone" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm sm:text-base leading-tight">Kendali Kunci</p>
+                        <p class="text-xs sm:text-sm mt-0.5 text-on-surface-variant" id="status-kunci">Memuat...</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Alarm -->
+                <div id="card-alarm" onclick="triggerAlarm()" class="ghome-card bg-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30">
+                    <div id="icon-bg-alarm" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors">
+                        <i id="icon-alarm" data-lucide="bell" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm sm:text-base leading-tight" id="title-alarm">Alarm Darurat</p>
+                        <p class="text-xs sm:text-sm mt-0.5 text-on-surface-variant" id="status-alarm">Nonaktif</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Cari HP -->
+                <div id="card-find" onclick="findPhone()" class="ghome-card bg-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30">
+                    <div id="icon-bg-find" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors">
+                        <i id="icon-find" data-lucide="radar" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm sm:text-base leading-tight">Cari HP</p>
+                        <p class="text-xs sm:text-sm mt-0.5 text-on-surface-variant" id="status-find">Ketuk untuk dering</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Foto Terakhir -->
+                <div onclick="window.open('https://drive.google.com/drive/folders/1oLfjaS2mlVSwm7CHiZC-PatsrGmjiKRl?usp=sharing', '_blank')" class="ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center gap-4 cursor-pointer select-none hover:bg-surface-variant/50 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-purple-900/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="folder-open" class="w-4 h-4 text-purple-400"></i>
+                    </div>
+                    <div class="truncate">
+                        <p class="font-medium text-sm truncate">Foto Terakhir</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5 truncate">Buka Google Drive</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Lacak Lokasi -->
+                <div onclick="openLocationModal()" class="ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center gap-4 cursor-pointer select-none hover:bg-surface-variant/50 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-emerald-900/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div class="truncate">
+                        <p class="font-medium text-sm truncate">Lacak Lokasi</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5 truncate">Lihat posisi HP</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Daftar Aplikasi -->
+                <div onclick="openAppListModal()" class="ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center gap-4 cursor-pointer select-none hover:bg-surface-variant/50 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-indigo-900/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="list" class="w-4 h-4 text-indigo-400"></i>
+                    </div>
+                    <div class="truncate">
+                        <p class="font-medium text-sm truncate">Daftar Aplikasi</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5 truncate">Lihat aplikasi di HP</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Notifikasi -->
+                <div onclick="openNotifModal()" class="ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center gap-4 cursor-pointer select-none hover:bg-surface-variant/50 transition-colors relative">
+                    <div class="w-10 h-10 rounded-full bg-amber-900/20 flex items-center justify-center shrink-0 relative">
+                        <i data-lucide="message-square" class="w-4 h-4 text-amber-400"></i>
+                        <span id="notif-badge" class="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5 hidden">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500 border border-surface"></span>
+                        </span>
+                    </div>
+                    <div class="truncate">
+                        <p class="font-medium text-sm truncate">Notifikasi</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5 truncate" id="notif-subtitle">Pesan masuk</p>
+                    </div>
+                </div>
+
+                <!-- CARD: Kirim Link -->
+                <div onclick="openSendLinkModal()" class="ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center gap-4 cursor-pointer select-none hover:bg-surface-variant/50 transition-colors">
+                    <div class="w-10 h-10 rounded-full bg-blue-900/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="link" class="w-4 h-4 text-blue-400"></i>
+                    </div>
+                    <div class="truncate">
+                        <p class="font-medium text-sm truncate">Kirim Link</p>
+                        <p class="text-xs text-on-surface-variant mt-0.5 truncate">Simpan ke Database</p>
+                    </div>
+                </div>
+            </div> <!-- End Tab Beranda -->
+
+            <!-- TAB 2: MACRO (Tombol Kustom) -->
+            <!-- Di desktop ini akan muncul bersamaan (contents), di HP disembunyikan jika bukan tab aktif -->
+            <div id="tab-macro" class="hidden md:contents">
+                <!-- Container untuk Tombol Kustom -->
+                <div id="custom-buttons-container" class="contents"></div>
+
+                <!-- CARD: Tambah Tombol Kustom -->
+                <div onclick="openAddButtonModal()" class="ghome-card bg-surface border-2 border-dashed border-surface-variant/50 rounded-[28px] p-4 sm:p-5 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center justify-center gap-2 cursor-pointer select-none text-on-surface-variant hover:text-emerald-400 hover:border-emerald-500/50 transition-colors">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span class="font-medium text-sm">Tambah Tombol</span>
+                </div>
+            </div> <!-- End Tab Macro -->
+
+            <!-- TAB 3: TEMPLATE (Placeholder) -->
+            <div id="tab-template" class="hidden">
+                <div class="col-span-2 flex flex-col items-center justify-center py-16 text-on-surface-variant bg-surface/50 border border-surface-variant/30 rounded-[28px]">
+                    <i data-lucide="layout-template" class="w-8 h-8 mb-3 opacity-50"></i>
+                    <p class="text-sm font-medium">Fitur Template Segera Hadir</p>
+                </div>
+            </div>
+
+            <!-- TAB 4: PENGATURAN (Placeholder) -->
+            <div id="tab-pengaturan" class="hidden">
+                <div class="col-span-2 flex flex-col items-center justify-center py-16 text-on-surface-variant bg-surface/50 border border-surface-variant/30 rounded-[28px]">
+                    <i data-lucide="settings" class="w-8 h-8 mb-3 opacity-50"></i>
+                    <p class="text-sm font-medium">Fitur Pengaturan Segera Hadir</p>
+                    <!-- Tombol Keluar khusus Mobile -->
+                    <button onclick="logout()" class="mt-6 px-6 py-2 rounded-full bg-rose-900/30 text-rose-400 border border-rose-500/30 flex items-center gap-2 text-sm font-medium">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation Bar (Khusus Mobile / Layar Kecil) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-surface-variant/30 flex justify-around items-center h-[72px] z-40 pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.2)]">
+            <!-- Tombol Nav: Beranda -->
+            <button id="nav-beranda" onclick="switchTab('beranda')" class="flex flex-col items-center justify-center w-full h-full text-emerald-400 transition-colors group">
+                <div class="nav-pill px-4 py-1 rounded-full bg-emerald-900/30 mb-0.5 group-hover:bg-emerald-900/50 transition-colors">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-medium">Beranda</span>
+            </button>
+
+            <!-- Tombol Nav: Macro -->
+            <button id="nav-macro" onclick="switchTab('macro')" class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-emerald-400 transition-colors group">
+                <div class="nav-pill px-4 py-1 rounded-full mb-0.5 group-hover:bg-surface-variant/50 transition-colors">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-medium">Macro</span>
+            </button>
+
+            <!-- Tombol Nav: Template -->
+            <button id="nav-template" onclick="switchTab('template')" class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-emerald-400 transition-colors group">
+                <div class="nav-pill px-4 py-1 rounded-full mb-0.5 group-hover:bg-surface-variant/50 transition-colors">
+                    <i data-lucide="layout-template" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-medium">Template</span>
+            </button>
+
+            <!-- Tombol Nav: Pengaturan -->
+            <button id="nav-pengaturan" onclick="switchTab('pengaturan')" class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant hover:text-emerald-400 transition-colors group">
+                <div class="nav-pill px-4 py-1 rounded-full mb-0.5 group-hover:bg-surface-variant/50 transition-colors">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-medium">Pengaturan</span>
+            </button>
+        </nav>
+
+    </div> <!-- End of Dashboard View -->
+
+    <!-- Modal Lacak Lokasi -->
+    <div id="location-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-surface border border-surface-variant rounded-[32px] p-6 sm:p-8 w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col" id="location-modal-content">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-medium text-on-surface">Lacak Lokasi</h2>
+                <button onclick="closeLocationModal()" class="p-2 bg-surface-variant/40 rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 bg-surface-variant/20 rounded-2xl p-6 mb-4 border border-surface-variant/30 flex flex-col items-center justify-center min-h-[160px]" id="location-result">
+                <i data-lucide="map" class="w-10 h-10 text-on-surface-variant mb-3 opacity-50"></i>
+                <p class="text-sm text-on-surface-variant text-center">Menunggu data lokasi dari perangkat...</p>
+            </div>
+
+            <div class="pt-2 border-t border-surface-variant/50">
+                <button onclick="requestLocation()" class="w-full py-3 mt-2 rounded-2xl text-sm font-medium bg-emerald-900/30 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/50 transition-colors flex items-center justify-center gap-2">
+                    <i id="icon-refresh-location" data-lucide="crosshair" class="w-4 h-4"></i>
+                    <span>Minta Lokasi Sekarang</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Notifikasi -->
+    <div id="notif-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-surface border border-surface-variant rounded-[32px] p-6 sm:p-8 w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col max-h-[80vh]" id="notif-modal-content">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-medium text-on-surface">Notifikasi HP</h2>
+                <button onclick="closeNotifModal()" class="p-2 bg-surface-variant/40 rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="notif-list-container" class="flex-1 overflow-y-auto pr-2 space-y-3 no-scrollbar mb-4 min-h-[150px]">
+                <p class="text-sm text-on-surface-variant text-center py-8">Belum ada notifikasi.</p>
+            </div>
+
+            <div class="pt-4 border-t border-surface-variant/50">
+                <button onclick="clearNotifications()" class="w-full py-3 rounded-2xl text-sm font-medium bg-rose-900/30 text-rose-300 border border-rose-500/30 hover:bg-rose-900/50 transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <span>Hapus Riwayat Notifikasi</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Daftar Aplikasi -->
+    <div id="app-list-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-surface border border-surface-variant rounded-[32px] p-6 sm:p-8 w-full max-w-sm transform scale-95 transition-transform duration-300 flex flex-col max-h-[80vh]" id="app-list-modal-content">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-medium text-on-surface">Daftar Aplikasi</h2>
+                <button onclick="closeAppListModal()" class="p-2 bg-surface-variant/40 rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Area List (Scrollable) -->
+            <div id="app-list-container" class="flex-1 overflow-y-auto pr-2 space-y-2 no-scrollbar mb-4 min-h-[150px]">
+                <p class="text-sm text-on-surface-variant text-center py-8">Memuat daftar aplikasi...</p>
+            </div>
+
+            <div class="pt-4 border-t border-surface-variant/50">
+                <button onclick="refreshAppList()" class="w-full py-3 rounded-2xl text-sm font-medium bg-indigo-900/30 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-2">
+                    <i id="icon-refresh-applist" data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span>Perbarui Daftar (Minta ke HP)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Kirim Link -->
+    <div id="send-link-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-surface border border-surface-variant rounded-[32px] p-6 sm:p-8 w-full max-w-sm transform scale-95 transition-transform duration-300" id="send-link-modal-content">
+            <h2 class="text-xl font-medium mb-5 text-on-surface">Kirim Link ke Firebase</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1.5 ml-1">Masukkan URL / Link</label>
+                    <input type="url" id="send-link-input" placeholder="https://..." class="w-full bg-surface-variant/30 text-on-surface text-sm rounded-2xl py-3.5 px-4 outline-none focus:bg-surface-variant/60 transition-colors border border-transparent focus:border-blue-500/50">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-8">
+                <button onclick="closeSendLinkModal()" class="px-5 py-2.5 rounded-full text-sm font-medium text-on-surface-variant hover:bg-surface-variant transition-colors">Batal</button>
+                <button onclick="saveLinkToFirebase()" class="px-5 py-2.5 rounded-full text-sm font-medium bg-blue-900/40 text-blue-300 hover:bg-blue-900/60 transition-colors">Simpan Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Tombol Kustom -->
+    <div id="add-btn-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-surface border border-surface-variant rounded-[32px] p-6 sm:p-8 w-full max-w-sm transform scale-95 transition-transform duration-300" id="add-btn-modal-content">
+            <h2 id="modal-btn-title" class="text-xl font-medium mb-5 text-on-surface">Buat Tombol Kustom</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1.5 ml-1">Nama Tombol</label>
+                    <input type="text" id="new-btn-name" placeholder="Misal: Nyalakan Lampu" class="w-full bg-surface-variant/30 text-on-surface text-sm rounded-2xl py-3.5 px-4 outline-none focus:bg-surface-variant/60 transition-colors border border-transparent focus:border-emerald-500/50">
+                </div>
+                <!-- PILIHAN IKON BARU -->
+                <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1.5 ml-1">Ikon Tombol</label>
+                    <div class="relative w-full bg-surface-variant/30 rounded-2xl border border-transparent focus-within:border-emerald-500/50 transition-colors">
+                        <select id="new-btn-icon" class="w-full bg-transparent text-on-surface text-sm py-3.5 px-4 outline-none appearance-none cursor-pointer">
+                            <option value="zap">⚡ Petir (Zap)</option>
+                            <option value="power">⏻ Power</option>
+                            <option value="lightbulb">💡 Lampu</option>
+                            <option value="fan">💨 Kipas</option>
+                            <option value="tv">📺 TV / Layar</option>
+                            <option value="speaker">🔊 Speaker</option>
+                            <option value="music">🎵 Musik</option>
+                            <option value="key">🔑 Kunci</option>
+                            <option value="door-open">🚪 Pintu</option>
+                            <option value="home">🏠 Rumah</option>
+                            <option value="car">🚗 Mobil</option>
+                            <option value="cpu">💻 Komputer</option>
+                            <option value="gamepad-2">🎮 Gamepad</option>
+                            <option value="wifi">📶 WiFi</option>
+                            <option value="bluetooth">ᛒ Bluetooth</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-on-surface-variant"></i>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-on-surface-variant mb-1.5 ml-1">Link Webhook Lengkap</label>
+                    <input type="url" id="new-btn-url" placeholder="https://trigger.macrodroid.com/..." class="w-full bg-surface-variant/30 text-on-surface text-sm rounded-2xl py-3.5 px-4 outline-none focus:bg-surface-variant/60 transition-colors border border-transparent focus:border-emerald-500/50">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-8">
+                <button onclick="closeAddButtonModal()" class="px-5 py-2.5 rounded-full text-sm font-medium text-on-surface-variant hover:bg-surface-variant transition-colors">Batal</button>
+                <button onclick="saveCustomButton()" class="px-5 py-2.5 rounded-full text-sm font-medium bg-emerald-900/40 text-emerald-300 hover:bg-emerald-900/60 transition-colors">Simpan Tombol</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+    <script>
+        // --- KONFIGURASI FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTW_IKKP67Cka-KmbvdsuEph7E-BgFv70",
+            authDomain: "ejot-smartremote.firebaseapp.com",
+            databaseURL: "https://ejot-smartremote-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ejot-smartremote",
+            storageBucket: "ejot-smartremote.firebasestorage.app",
+            messagingSenderId: "869552523337",
+            appId: "1:869552523337:web:7fd4f8f5155cf3d3bf5798",
+            measurementId: "G-9KS1YZX56K"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const devicesListRef = database.ref('devices');
+
+        // --- SISTEM LOGIN ---
+        function initAuth() {
+            const isLoggedIn = localStorage.getItem('ejot_logged_in');
+            const loginView = document.getElementById('login-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            
+            if (isLoggedIn === 'true') {
+                loginView.classList.add('hidden');
+                loginView.classList.remove('flex');
+                dashboardView.classList.remove('hidden');
+                dashboardView.classList.add('flex');
+            } else {
+                loginView.classList.remove('hidden');
+                loginView.classList.add('flex');
+                dashboardView.classList.add('hidden');
+                dashboardView.classList.remove('flex');
+            }
+        }
+
+        function checkLogin() {
+            const pinInput = document.getElementById('login-pin');
+            const errorText = document.getElementById('login-error');
+            const loginBtn = document.getElementById('btn-login-submit');
+            const originalBtnText = loginBtn.innerHTML;
+            
+            const inputVal = pinInput.value;
+            if (!inputVal) return;
+
+            loginBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>Memeriksa...</span>';
+            lucide.createIcons();
+
+            database.ref('settings/pin').get().then((snap) => {
+                let validPins = ["12345", "54321"]; 
+                
+                if (snap.exists()) {
+                    const pinData = String(snap.val());
+                    validPins = pinData.split(',').map(pin => pin.trim());
+                }
+
+                if (validPins.includes(inputVal)) {
+                    localStorage.setItem('ejot_logged_in', 'true');
+                    pinInput.value = '';
+                    errorText.classList.add('hidden');
+                    initAuth();
+                } else {
+                    errorText.textContent = "PIN yang Anda masukkan salah!";
+                    errorText.classList.remove('hidden');
+                    pinInput.value = '';
+                    pinInput.focus();
+                }
+            }).catch((error) => {
+                errorText.textContent = "Gagal terhubung ke server!";
+                errorText.classList.remove('hidden');
+                console.error(error);
+            }).finally(() => {
+                loginBtn.innerHTML = originalBtnText;
+                lucide.createIcons();
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('ejot_logged_in');
+            initAuth();
+        }
+
+        function handleLoginKeyPress(event) {
+            if (event.key === 'Enter') checkLogin();
+        }
+
+        initAuth();
+
+        // --- SISTEM TAB (BOTTOM NAV) ---
+        function switchTab(tabId) {
+            const tabs = ['beranda', 'macro', 'template', 'pengaturan'];
+            
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if(!el || !navBtn) return;
+
+                const pill = navBtn.querySelector('.nav-pill');
+                
+                if (t === tabId) {
+                    // Tampilkan Konten
+                    if(t === 'beranda' || t === 'macro') {
+                        el.className = 'contents'; // Gunakan format Grid di Mobile
+                    } else {
+                        // Untuk Halaman Template/Pengaturan yang masih kosong
+                        el.className = 'col-span-2 md:col-span-full flex flex-col items-center justify-center py-16 text-on-surface-variant bg-surface/50 border border-surface-variant/30 rounded-[28px]';
+                    }
+                    
+                    // Styling Menu Aktif
+                    navBtn.classList.remove('text-on-surface-variant');
+                    navBtn.classList.add('text-emerald-400');
+                    if(pill) pill.classList.add('bg-emerald-900/30');
+                } else {
+                    // Sembunyikan Konten (Tetap tampil jika layar Desktop menggunakan md:contents)
+                    if(t === 'beranda' || t === 'macro') {
+                        el.className = 'hidden md:contents';
+                    } else {
+                        el.className = 'hidden';
+                    }
+                    
+                    // Styling Menu Tidak Aktif
+                    navBtn.classList.add('text-on-surface-variant');
+                    navBtn.classList.remove('text-emerald-400');
+                    if(pill) pill.classList.remove('bg-emerald-900/30');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // --- VARIABEL & STATE APLIKASI ---
+        let isLocked = false;
+        let alarmActive = false;
+        let isFindingPhone = false;
+        let isConnected = false;
+        let lastSeenTimestamp = 0;
+        let isHpOnline = false;
+        let currentDeviceId = null;
+        let currentMacrodroidId = null;
+        let currentBatteryLevel = null;
+        let currentBatteryStatus = null;
+        let currentGpsStatus = null;
+        let currentGpsState = null;
+        
+        let isEditMode = false;
+        let currentCustomButtons = {};
+        let editingButtonKey = null;
+
+        lucide.createIcons();
+        const logContainer = document.getElementById('activity-log');
+
+        function addLog(message, type = 'info') {
+            const time = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second:'2-digit' });
+            const logEl = document.createElement('div');
+            let color = type === 'success' ? 'text-emerald-300' : type === 'danger' ? 'text-rose-300' : type === 'warning' ? 'text-amber-300' : 'text-on-surface-variant';
+            logEl.className = `${color} opacity-0 transition-opacity duration-500`;
+            logEl.innerHTML = `<span class="text-surface-variant font-medium mr-1">[${time}]</span> ${message}`;
+            logContainer.appendChild(logEl);
+            requestAnimationFrame(() => { logEl.classList.remove('opacity-0'); });
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateConnectionUI() {
+            const connPill = document.getElementById('conn-pill');
+            const ping = document.getElementById('status-ping');
+            const dot = document.getElementById('status-dot');
+            const statusTxt = document.getElementById('status-text');
+
+            if (!isConnected) {
+                connPill.className = 'bg-amber-900/30 text-amber-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors shrink-0';
+                ping.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75';
+                dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500';
+                statusTxt.textContent = "Menyambungkan...";
+            } else if (!isHpOnline && lastSeenTimestamp !== 0) {
+                connPill.className = 'bg-rose-900/30 text-rose-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors shrink-0';
+                ping.className = 'hidden';
+                dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500';
+                statusTxt.textContent = "Koneksi HP Terputus";
+            } else {
+                connPill.className = 'bg-emerald-900/30 text-emerald-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors shrink-0';
+                ping.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75';
+                dot.className = 'relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500';
+                statusTxt.textContent = "Aman & Terhubung";
+            }
+        }
+
+        database.ref('.info/connected').on('value', (snap) => {
+            isConnected = snap.val() === true;
+            updateConnectionUI();
+        });
+
+        devicesListRef.on('value', (snapshot) => {
+            const selectEl = document.getElementById('device-select');
+            selectEl.innerHTML = '';
+            if (snapshot.exists()) {
+                const devices = snapshot.val();
+                let firstDevice = null;
+                for (const devId in devices) {
+                    if(!firstDevice) firstDevice = devId;
+                    const option = document.createElement('option');
+                    option.value = devId; option.textContent = devId;
+                    selectEl.appendChild(option);
+                }
+                if (currentDeviceId && devices[currentDeviceId]) {
+                    selectEl.value = currentDeviceId;
+                } else {
+                    selectEl.value = firstDevice;
+                    changeDevice(firstDevice);
+                }
+            } else {
+                selectEl.innerHTML = '<option value="">Tidak ada perangkat</option>';
+            }
+        });
+
+        function changeDevice(deviceId) {
+            if (currentDeviceId) {
+                database.ref(`devices/${currentDeviceId}/status`).off();
+                database.ref(`devices/${currentDeviceId}/last_seen`).off();
+                database.ref(`devices/${currentDeviceId}/macrodroid_id`).off();
+                database.ref(`devices/${currentDeviceId}/current_app`).off();
+                database.ref(`devices/${currentDeviceId}/custom_buttons`).off();
+                database.ref(`devices/${currentDeviceId}/app_list`).off();
+                database.ref(`devices/${currentDeviceId}/location`).off();
+                database.ref(`devices/${currentDeviceId}/battery_level`).off();
+                database.ref(`devices/${currentDeviceId}/battery_status`).off();
+                database.ref(`devices/${currentDeviceId}/gps_status`).off();
+                database.ref(`devices/${currentDeviceId}/gps_state`).off();
+                database.ref(`devices/${currentDeviceId}/notifications`).off();
+            }
+            currentDeviceId = deviceId;
+            
+            savedNotifications = JSON.parse(localStorage.getItem('ejot_notifs_' + deviceId) || '[]');
+            lastNotifCount = savedNotifications.length;
+
+            addLog(`Memantau: ${deviceId}`, 'info');
+
+            database.ref(`devices/${deviceId}/status`).on('value', (snap) => updateDeviceUI(snap.val()));
+            database.ref(`devices/${deviceId}/last_seen`).on('value', (snap) => { lastSeenTimestamp = snap.val() || 0; checkHeartbeat(); });
+            database.ref(`devices/${deviceId}/macrodroid_id`).on('value', (snap) => { currentMacrodroidId = snap.val(); });
+            
+            database.ref(`devices/${deviceId}/current_app`).on('value', (snap) => {
+                const appText = document.getElementById('active-app-text');
+                const refreshIcon = document.getElementById('refresh-app-icon');
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+                if (snap.exists() && snap.val() !== "") {
+                    appText.textContent = snap.val();
+                } else {
+                    appText.textContent = "Layar Utama";
+                }
+            });
+
+            database.ref(`devices/${deviceId}/custom_buttons`).on('value', (snap) => renderCustomButtons(snap.val()));
+            database.ref(`devices/${deviceId}/app_list`).on('value', (snap) => renderAppList(snap.val()));
+            database.ref(`devices/${deviceId}/location`).on('value', (snap) => renderLocation(snap.val()));
+            
+            database.ref(`devices/${deviceId}/battery_level`).on('value', (snap) => {
+                currentBatteryLevel = snap.val(); updateBatteryUI();
+            });
+            database.ref(`devices/${deviceId}/battery_status`).on('value', (snap) => {
+                currentBatteryStatus = snap.val(); updateBatteryUI();
+            });
+            database.ref(`devices/${deviceId}/gps_status`).on('value', (snap) => {
+                currentGpsStatus = snap.val(); updateGpsUI();
+            });
+            database.ref(`devices/${deviceId}/gps_state`).on('value', (snap) => {
+                currentGpsState = snap.val(); updateGpsUI();
+            });
+            database.ref(`devices/${deviceId}/notifications`).on('value', (snap) => renderNotifications(snap.val()));
+        }
+
+        function updateDeviceUI(val) {
+            const card = document.getElementById('card-kunci');
+            const statusText = document.getElementById('status-kunci');
+            const iconBg = document.getElementById('icon-bg-kunci');
+            if (!card || !statusText || !iconBg) return;
+
+            if (val === 'LOCKED') {
+                isLocked = true;
+                card.className = 'ghome-card bg-active-green text-on-active-green rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-transparent';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 opacity-90';
+                statusText.textContent = 'Menyala (Terkunci)';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-active-green-icon flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="lock" class="w-5 h-5 sm:w-6 sm:h-6 text-active-green-icon"></i>';
+            } else {
+                isLocked = false;
+                card.className = 'ghome-card bg-surface text-on-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 text-on-surface-variant';
+                statusText.textContent = 'Mati (Terbuka)';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="smartphone" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>';
+            }
+            lucide.createIcons();
+        }
+
+        function checkHeartbeat() {
+            if(!lastSeenTimestamp) return;
+            const selisihDetik = (Date.now() - lastSeenTimestamp) / 1000;
+            const hpPill = document.getElementById('hp-pill');
+            const hpPing = document.getElementById('hp-ping');
+            const hpDot = document.getElementById('hp-dot');
+            const hpText = document.getElementById('hp-status-text');
+
+            if (selisihDetik > 30) {
+                isHpOnline = false;
+                hpPing.className = 'hidden';
+                hpDot.className = 'relative inline-flex rounded-full h-2 w-2 bg-rose-500';
+                hpText.className = 'text-rose-400';
+                
+                let totalSeconds = Math.round(selisihDetik);
+                let offlineTimeStr = "";
+                
+                if (totalSeconds < 60) {
+                    offlineTimeStr = `${totalSeconds}d`;
+                } else if (totalSeconds < 3600) {
+                    let m = Math.floor(totalSeconds / 60);
+                    let s = totalSeconds % 60;
+                    offlineTimeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                } else {
+                    let h = Math.floor(totalSeconds / 3600);
+                    let m = Math.floor((totalSeconds % 3600) / 60);
+                    let s = totalSeconds % 60;
+                    offlineTimeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+                
+                hpText.textContent = `Offline (${offlineTimeStr})`;
+            } else {
+                isHpOnline = true;
+                hpPing.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75';
+                hpDot.className = 'relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
+                hpText.className = 'text-on-surface-variant';
+                hpText.textContent = 'Online';
+            }
+            updateConnectionUI();
+        }
+        setInterval(checkHeartbeat, 5000);
+
+        function updateBatteryUI() {
+            const pill = document.getElementById('battery-pill');
+            const text = document.getElementById('battery-text');
+            const iconContainer = document.getElementById('battery-icon-container');
+            if (!pill || !text || !iconContainer) return;
+
+            if (currentBatteryLevel === null && currentBatteryStatus === null) {
+                text.textContent = "Baterai: --"; return;
+            }
+
+            let level = parseInt(currentBatteryLevel) || 0;
+            let statusStr = (currentBatteryStatus || '').toLowerCase();
+            let isCharging = statusStr.includes('charging') || statusStr.includes('cas') || statusStr.includes('plugged');
+
+            let iconName = 'battery'; let colorClass = 'text-emerald-400'; let bgClass = 'bg-emerald-900/30';
+
+            if (isCharging) {
+                iconName = 'battery-charging'; text.textContent = `${level}% (Cas)`;
+            } else {
+                text.textContent = `${level}%`;
+                if (level <= 20) {
+                    iconName = 'battery-warning'; colorClass = 'text-rose-400'; bgClass = 'bg-rose-900/30';
+                } else if (level >= 90) { iconName = 'battery-full'; } 
+                else if (level >= 50) { iconName = 'battery-medium'; }
+            }
+
+            pill.className = `${bgClass} ${colorClass} rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-transparent`;
+            iconContainer.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4"></i>`;
+            lucide.createIcons();
+        }
+
+        function updateGpsUI() {
+            const pill = document.getElementById('gps-pill');
+            const text = document.getElementById('gps-text');
+            const iconContainer = document.getElementById('gps-icon-container');
+            if (!pill || !text || !iconContainer) return;
+
+            if ((currentGpsStatus === null || currentGpsStatus === undefined || currentGpsStatus === "") && 
+                (currentGpsState === null || currentGpsState === undefined || currentGpsState === "")) {
+                text.textContent = "GPS: --";
+                pill.className = "bg-surface text-on-surface-variant rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-surface-variant/50";
+                iconContainer.innerHTML = `<i data-lucide="map-pin-off" class="w-4 h-4"></i>`;
+                lucide.createIcons();
+                return;
+            }
+
+            const statusStr = String(currentGpsStatus || '').toLowerCase();
+            const stateStr = String(currentGpsState || '').toLowerCase();
+            const combinedStr = `${statusStr} ${stateStr}`;
+
+            const isOff = combinedStr.includes('gps_off') || combinedStr.includes('gps_disabled') || combinedStr.includes('off') || combinedStr.includes('false') || combinedStr.includes('mati') || combinedStr.includes('disabled');
+
+            if (isOff) {
+                text.textContent = "GPS: OFF";
+                pill.className = "bg-rose-900/30 text-rose-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-rose-500/30";
+                iconContainer.innerHTML = `<i data-lucide="map-pin-off" class="w-4 h-4"></i>`;
+            } else {
+                text.textContent = "GPS: ON";
+                pill.className = "bg-emerald-900/30 text-emerald-400 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors cursor-default select-none shrink-0 border border-transparent";
+                iconContainer.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        // --- Actions ---
+        function toggleDevice() {
+            if (!currentMacrodroidId) return addLog("Tunggu ID perangkat...", "warning");
+            const status = isLocked ? 'UNLOCKED' : 'LOCKED';
+            const endpoint = isLocked ? 'OPENKEY' : 'CLOSEKEY';
+            database.ref(`devices/${currentDeviceId}/status`).set(status);
+            fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/${endpoint}`, { mode: 'no-cors' });
+            addLog(`Sinyal ${status} dikirim!`, 'success');
+        }
+
+        function triggerAlarm() {
+            if (!currentMacrodroidId) return addLog("ID belum siap", "danger");
+            alarmActive = !alarmActive;
+            const endpoint = alarmActive ? 'WAR-ALERT' : 'OFF-WAR-ALERT';
+            
+            const card = document.getElementById('card-alarm');
+            const statusText = document.getElementById('status-alarm');
+            const iconBg = document.getElementById('icon-bg-alarm');
+
+            if (alarmActive) {
+                card.className = 'ghome-card bg-active-red text-on-active-red rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-transparent';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 opacity-90 font-medium';
+                statusText.textContent = 'MENYALA!';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-active-red-icon flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="bell-ring" class="w-5 h-5 sm:w-6 sm:h-6 text-active-red-icon animate-bounce"></i>';
+                addLog("ALARM DIBUNYIKAN!", "danger");
+            } else {
+                card.className = 'ghome-card bg-surface text-on-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 text-on-surface-variant';
+                statusText.textContent = 'Nonaktif';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="bell" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>';
+                addLog("Alarm dimatikan", "success");
+            }
+            lucide.createIcons();
+            fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/${endpoint}`, { mode: 'no-cors' });
+        }
+
+        function findPhone() {
+            if (!currentMacrodroidId) return addLog("ID belum siap", "danger");
+            isFindingPhone = !isFindingPhone;
+            const endpoint = isFindingPhone ? 'FIND-PHONE-ON' : 'FIND-PHONE-OFF';
+            
+            const card = document.getElementById('card-find');
+            const statusText = document.getElementById('status-find');
+            const iconBg = document.getElementById('icon-bg-find');
+
+            if (isFindingPhone) {
+                card.className = 'ghome-card bg-cyan-900/40 text-cyan-100 rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-cyan-500/50';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 opacity-90 font-medium text-cyan-300';
+                statusText.textContent = 'MENCARI...';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-cyan-500/20 flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="radar" class="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 animate-pulse"></i>';
+                addLog("Mencari HP... Dering diaktifkan!", "info");
+            } else {
+                card.className = 'ghome-card bg-surface text-on-surface rounded-[28px] p-4 sm:p-5 h-36 sm:h-40 flex flex-col justify-between cursor-pointer select-none border border-surface-variant/30';
+                statusText.className = 'text-xs sm:text-sm mt-0.5 text-on-surface-variant';
+                statusText.textContent = 'Ketuk untuk dering';
+                iconBg.className = 'w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-surface-variant flex items-center justify-center transition-colors';
+                iconBg.innerHTML = '<i data-lucide="radar" class="w-5 h-5 sm:w-6 sm:h-6 text-on-surface"></i>';
+                addLog("Pencarian HP dihentikan", "success");
+            }
+            lucide.createIcons();
+            fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/${endpoint}`, { mode: 'no-cors' });
+        }
+
+        function refreshCurrentApp() {
+            if (!currentDeviceId) return addLog("Pilih perangkat terlebih dahulu", "danger");
+            const appText = document.getElementById('active-app-text');
+            appText.textContent = "Mengambil data...";
+            
+            const refreshIcon = document.getElementById('refresh-app-icon');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+            database.ref(`devices/${currentDeviceId}/current_app`).get().then((snap) => {
+                if (snap.exists() && snap.val() !== "") {
+                    appText.textContent = snap.val();
+                } else {
+                    appText.textContent = "Layar Utama";
+                }
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+            }).catch((error) => {
+                addLog(`Gagal cek Firebase: ${error.message}`, "danger");
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+            });
+            
+            if (currentMacrodroidId) {
+                fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/curent_app`, { mode: 'no-cors' });
+                addLog("Permintaan update dikirim ke HP", "info");
+            }
+        }
+
+        // --- Fitur Daftar Aplikasi ---
+        function openAppListModal() {
+            const modal = document.getElementById('app-list-modal');
+            const content = document.getElementById('app-list-modal-content');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; modal.classList.remove('opacity-0'); content.classList.remove('scale-95');
+        }
+
+        function closeAppListModal() {
+            const modal = document.getElementById('app-list-modal');
+            const content = document.getElementById('app-list-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderAppList(data) {
+            const container = document.getElementById('app-list-container');
+            container.innerHTML = '';
+            const refreshIcon = document.getElementById('icon-refresh-applist');
+            if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+
+            if (!data) {
+                container.innerHTML = '<p class="text-sm text-on-surface-variant text-center py-8">Belum ada data aplikasi. Klik Perbarui Daftar.</p>'; return;
+            }
+
+            let apps = [];
+            if (typeof data === 'string') apps = data.split(',').filter(app => app.trim() !== '');
+            else if (Array.isArray(data)) apps = data;
+            else if (typeof data === 'object') apps = Object.values(data);
+
+            if (apps.length === 0) { container.innerHTML = '<p class="text-sm text-on-surface-variant text-center py-8">Daftar kosong.</p>'; return; }
+
+            apps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-3 bg-surface-variant/20 border border-surface-variant/30 rounded-xl text-sm font-medium text-on-surface flex items-center gap-3';
+                div.innerHTML = `<div class="w-8 h-8 rounded-full bg-surface-variant/50 flex items-center justify-center shrink-0"><i data-lucide="box" class="w-4 h-4 text-on-surface-variant"></i></div><span class="truncate">${app.trim()}</span>`;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function refreshAppList() {
+            if (!currentMacrodroidId) return addLog("ID Webhook belum siap", "danger");
+            const refreshIcon = document.getElementById('icon-refresh-applist');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+            fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/get_app_list`, { mode: 'no-cors' });
+            addLog("Permintaan daftar aplikasi dikirim ke HP", "info");
+            setTimeout(() => { if (refreshIcon) refreshIcon.classList.remove('animate-spin'); }, 5000);
+        }
+
+        // --- Fitur Lacak Lokasi ---
+        function openLocationModal() {
+            const modal = document.getElementById('location-modal');
+            const content = document.getElementById('location-modal-content');
+            modal.classList.remove('hidden'); void modal.offsetWidth;
+            modal.classList.remove('opacity-0'); content.classList.remove('scale-95');
+        }
+
+        function closeLocationModal() {
+            const modal = document.getElementById('location-modal');
+            const content = document.getElementById('location-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderLocation(locString) {
+            const container = document.getElementById('location-result');
+            const refreshIcon = document.getElementById('icon-refresh-location');
+            if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+
+            if (!locString) {
+                container.innerHTML = `<i data-lucide="map" class="w-10 h-10 text-on-surface-variant mb-3 opacity-50"></i><p class="text-sm text-on-surface-variant text-center">Belum ada data lokasi tersimpan.</p>`;
+                lucide.createIcons(); return;
+            }
+            const mapsUrl = `https://maps.google.com/?q=${locString}`;
+            container.innerHTML = `
+                <div class="w-12 h-12 rounded-full bg-emerald-900/30 flex items-center justify-center mb-4"><i data-lucide="map-pin" class="w-6 h-6 text-emerald-400"></i></div>
+                <p class="text-xs text-on-surface-variant mb-4 font-mono bg-black/30 px-3 py-1.5 rounded-lg border border-surface-variant/30">${locString}</p>
+                <a href="${mapsUrl}" target="_blank" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium text-center transition-colors flex items-center justify-center gap-2"><i data-lucide="external-link" class="w-4 h-4"></i>Buka di Google Maps</a>
+            `;
+            lucide.createIcons();
+        }
+
+        function requestLocation() {
+            if (!currentMacrodroidId) return addLog("ID Webhook belum siap", "danger");
+            const refreshIcon = document.getElementById('icon-refresh-location');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+            fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/get_location`, { mode: 'no-cors' });
+            addLog("Permintaan lokasi GPS dikirim ke HP...", "info");
+            setTimeout(() => { if (refreshIcon) refreshIcon.classList.remove('animate-spin'); }, 8000);
+        }
+
+        // --- Fitur Notifikasi ---
+        let lastNotifCount = 0;
+        let savedNotifications = []; 
+
+        function openNotifModal() {
+            const modal = document.getElementById('notif-modal');
+            const content = document.getElementById('notif-modal-content');
+            modal.classList.remove('hidden'); void modal.offsetWidth; 
+            modal.classList.remove('opacity-0'); content.classList.remove('scale-95');
+            const badge = document.getElementById('notif-badge');
+            if(badge) badge.classList.add('hidden');
+        }
+
+        function closeNotifModal() {
+            const modal = document.getElementById('notif-modal');
+            const content = document.getElementById('notif-modal-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function renderNotifications(data) {
+            const container = document.getElementById('notif-list-container');
+            const subtitle = document.getElementById('notif-subtitle');
+            const badge = document.getElementById('notif-badge');
+            
+            let incomingNotifs = [];
+            if (data) {
+                if (typeof data === 'object' && !Array.isArray(data) && (data.app || data.title || data.text)) {
+                    incomingNotifs.push(data); 
+                } else if (typeof data === 'object') {
+                    Object.values(data).forEach(val => { if (val && typeof val === 'object') incomingNotifs.push(val); });
+                }
+            }
+
+            let hasNew = false;
+            incomingNotifs.forEach(inNotif => {
+                const fingerprint = `${inNotif.app}-${inNotif.title}-${inNotif.text}-${inNotif.time}`;
+                const isDuplicate = savedNotifications.some(saved => `${saved.app}-${saved.title}-${saved.text}-${saved.time}` === fingerprint);
+                if (!isDuplicate) { savedNotifications.push(inNotif); hasNew = true; }
+            });
+
+            if (hasNew && currentDeviceId) localStorage.setItem('ejot_notifs_' + currentDeviceId, JSON.stringify(savedNotifications));
+
+            container.innerHTML = '';
+            if (savedNotifications.length === 0) {
+                container.innerHTML = '<p class="text-sm text-on-surface-variant text-center py-8">Belum ada notifikasi baru.</p>';
+                subtitle.textContent = "Kosong"; lastNotifCount = 0; return;
+            }
+
+            const modal = document.getElementById('notif-modal');
+            if (savedNotifications.length > lastNotifCount && modal.classList.contains('hidden') && badge) badge.classList.remove('hidden');
+            lastNotifCount = savedNotifications.length;
+            subtitle.textContent = `${savedNotifications.length} pesan`;
+
+            const displayNotifs = [...savedNotifications].reverse();
+            displayNotifs.forEach((notif) => {
+                const div = document.createElement('div');
+                div.className = 'p-3.5 bg-surface-variant/20 border border-surface-variant/30 rounded-2xl';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5"><span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider truncate mr-2">${notif.app || 'Aplikasi / Sistem'}</span><span class="text-[10px] text-on-surface-variant shrink-0">${notif.time || ''}</span></div>
+                    <p class="text-sm font-medium text-on-surface leading-snug mb-1">${notif.title || 'Pesan Baru'}</p>
+                    <p class="text-xs text-on-surface-variant leading-relaxed opacity-90">${notif.text || ''}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function clearNotifications() {
+            if (!currentDeviceId) return;
+            database.ref(`devices/${currentDeviceId}/notifications`).remove()
+                .then(() => {
+                    savedNotifications = []; localStorage.removeItem('ejot_notifs_' + currentDeviceId);
+                    lastNotifCount = 0; renderNotifications(null); addLog("Riwayat notifikasi dibersihkan", "info"); closeNotifModal();
+                }).catch(err => addLog(`Gagal menghapus: ${err.message}`, "danger"));
+        }
+
+        function checkStatus() {
+            if(!currentDeviceId) return addLog("Pilih perangkat terlebih dahulu!", "danger");
+            addLog(`Sinkronisasi Paksa: ${currentDeviceId}`, "warning");
+            
+            database.ref(`devices/${currentDeviceId}/status`).get().then((snap) => {
+                if (snap.exists()) { updateDeviceUI(snap.val()); addLog(`Status Kunci: ${snap.val()}`, "success"); }
+            }).catch(err => addLog(`Gagal cek status: ${err.message}`, "danger"));
+
+            const appText = document.getElementById('active-app-text');
+            appText.textContent = "Memperbarui...";
+
+            database.ref(`devices/${currentDeviceId}/current_app`).get().then((snap) => {
+                if (snap.exists() && snap.val() !== "") { appText.textContent = snap.val(); addLog(`Aplikasi: ${snap.val()}`, "success"); } 
+                else { appText.textContent = "Layar Utama"; addLog(`Aplikasi: Layar Utama`, "success"); }
+            }).catch(err => addLog(`Gagal cek aplikasi: ${err.message}`, "danger"));
+
+            if (currentMacrodroidId) {
+                fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/curent_app`, { mode: 'no-cors' });
+                fetch(`https://trigger.macrodroid.com/${currentMacrodroidId}/GPS-Status`, { mode: 'no-cors' });
+            }
+        }
+
+        // --- Fitur Kirim Link ---
+        function openSendLinkModal() {
+            const modal = document.getElementById('send-link-modal');
+            const content = document.getElementById('send-link-modal-content');
+            document.getElementById('send-link-input').value = '';
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }
+
+        function closeSendLinkModal() {
+            const modal = document.getElementById('send-link-modal');
+            const content = document.getElementById('send-link-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function saveLinkToFirebase() {
+            const urlInput = document.getElementById('send-link-input').value.trim();
+            if (!urlInput) return addLog("Link tidak boleh kosong!", "warning");
+            
+            database.ref('Website').set({
+                url: urlInput,
+                timestamp: Date.now()
+            }).then(() => {
+                closeSendLinkModal();
+                addLog("Link berhasil disimpan ke Website.json", "success");
+            }).catch(err => addLog(`Gagal menyimpan link: ${err.message}`, "danger"));
+        }
+
+        // --- Fitur Tombol Kustom & Mode Edit ---
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('btn-edit-mode');
+            if (isEditMode) {
+                btn.classList.add('bg-emerald-900/40', 'text-emerald-400', 'border-emerald-500/50');
+                btn.classList.remove('bg-surface', 'text-on-surface-variant');
+                addLog("Mode Edit Tombol diaktifkan", "warning");
+            } else {
+                btn.classList.remove('bg-emerald-900/40', 'text-emerald-400', 'border-emerald-500/50');
+                btn.classList.add('bg-surface', 'text-on-surface-variant');
+                addLog("Mode Edit Tombol dinonaktifkan", "info");
+            }
+            renderCustomButtons(currentCustomButtons);
+        }
+
+        function openAddButtonModal() {
+            editingButtonKey = null;
+            document.getElementById('modal-btn-title').textContent = "Buat Tombol Kustom";
+            document.getElementById('new-btn-name').value = '';
+            document.getElementById('new-btn-url').value = '';
+            document.getElementById('new-btn-icon').value = 'zap'; 
+
+            const modal = document.getElementById('add-btn-modal'); 
+            const content = document.getElementById('add-btn-modal-content');
+            modal.classList.remove('hidden'); 
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0'); 
+            content.classList.remove('scale-95');
+        }
+
+        function openEditButtonModal(key) {
+            editingButtonKey = key;
+            const btnData = currentCustomButtons[key];
+            if(!btnData) return;
+
+            document.getElementById('modal-btn-title').textContent = "Edit Tombol";
+            document.getElementById('new-btn-name').value = btnData.name;
+            document.getElementById('new-btn-url').value = btnData.url;
+            document.getElementById('new-btn-icon').value = btnData.icon || 'zap'; 
+
+            const modal = document.getElementById('add-btn-modal'); 
+            const content = document.getElementById('add-btn-modal-content');
+            modal.classList.remove('hidden'); 
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0'); 
+            content.classList.remove('scale-95');
+        }
+
+        function closeAddButtonModal() {
+            const modal = document.getElementById('add-btn-modal'); 
+            const content = document.getElementById('add-btn-modal-content');
+            modal.classList.add('opacity-0'); 
+            content.classList.add('scale-95'); 
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function saveCustomButton() {
+            if (!currentDeviceId) return addLog("Pilih perangkat terlebih dahulu!", "danger");
+            const name = document.getElementById('new-btn-name').value.trim(); 
+            const url = document.getElementById('new-btn-url').value.trim();
+            const icon = document.getElementById('new-btn-icon').value;
+
+            if (!name || !url) return addLog("Nama dan URL Webhook wajib diisi!", "warning");
+            
+            if (editingButtonKey) {
+                database.ref(`devices/${currentDeviceId}/custom_buttons/${editingButtonKey}`).update({ 
+                    name: name, url: url, icon: icon
+                }).then(() => {
+                    closeAddButtonModal(); 
+                    addLog(`Tombol "${name}" diperbarui.`, "success");
+                }).catch(err => addLog(`Gagal mengedit tombol: ${err.message}`, "danger"));
+            } else {
+                database.ref(`devices/${currentDeviceId}/custom_buttons`).push({ 
+                    name: name, url: url, icon: icon, order: Date.now()
+                }).then(() => {
+                    closeAddButtonModal(); 
+                    addLog(`Tombol "${name}" ditambahkan.`, "success");
+                }).catch(err => addLog(`Gagal menyimpan tombol: ${err.message}`, "danger"));
+            }
+        }
+
+        function renderCustomButtons(buttonsObj) {
+            currentCustomButtons = buttonsObj || {};
+            const container = document.getElementById('custom-buttons-container'); 
+            container.innerHTML = '';
+            if (!buttonsObj) return;
+
+            const sortedKeys = Object.keys(buttonsObj).sort((a, b) => {
+                return (buttonsObj[a].order || 0) - (buttonsObj[b].order || 0);
+            });
+
+            sortedKeys.forEach((key, index) => {
+                const btn = buttonsObj[key]; 
+                const card = document.createElement('div');
+                const iconName = btn.icon || 'zap'; 
+
+                card.className = 'ghome-card bg-surface border border-surface-variant/30 rounded-[28px] p-3 sm:p-4 h-20 sm:h-24 col-span-2 md:col-span-1 flex items-center relative overflow-hidden group select-none';
+                
+                if (isEditMode) {
+                    card.classList.add('border-emerald-500/50', 'bg-emerald-900/10');
+                    card.innerHTML = `
+                        <div class="flex items-center gap-3 w-full h-full opacity-60 pointer-events-none">
+                            <div class="w-8 h-8 rounded-full bg-emerald-900/20 flex items-center justify-center shrink-0"><i data-lucide="${iconName}" class="w-3.5 h-3.5 text-emerald-400"></i></div>
+                            <div class="truncate pr-24 w-full">
+                                <p class="font-medium text-xs truncate">${btn.name}</p>
+                                <p class="text-[10px] text-on-surface-variant mt-0.5 truncate">${btn.url}</p>
+                            </div>
+                        </div>
+                        <div class="absolute right-2 top-0 bottom-0 flex items-center justify-center gap-0.5 z-10 bg-surface/80 px-1 backdrop-blur-sm">
+                            <button onclick="event.stopPropagation(); moveButton('${key}', -1, ${index}, ${sortedKeys.length})" class="p-1.5 bg-surface-variant/40 text-on-surface-variant rounded-full hover:bg-surface-variant/80 transition-colors" ${index === 0 ? 'opacity-30' : ''}><i data-lucide="chevron-left" class="w-3 h-3"></i></button>
+                            <button onclick="event.stopPropagation(); moveButton('${key}', 1, ${index}, ${sortedKeys.length})" class="p-1.5 bg-surface-variant/40 text-on-surface-variant rounded-full hover:bg-surface-variant/80 transition-colors" ${index === sortedKeys.length - 1 ? 'opacity-30' : ''}><i data-lucide="chevron-right" class="w-3 h-3"></i></button>
+                            <button onclick="event.stopPropagation(); openEditButtonModal('${key}')" class="p-1.5 bg-blue-900/40 text-blue-400 rounded-full hover:bg-blue-900/60 transition-colors ml-1"><i data-lucide="edit-2" class="w-3 h-3"></i></button>
+                            <button onclick="event.stopPropagation(); deleteCustomButton('${key}', '${btn.name}')" class="p-1.5 bg-rose-900/40 text-rose-400 rounded-full hover:bg-rose-900/60 transition-colors"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                        </div>
+                    `;
+                } else {
+                    card.classList.add('cursor-pointer');
+                    card.innerHTML = `
+                        <div class="flex items-center gap-4 w-full h-full" onclick="triggerCustomButton('${btn.url}', '${btn.name}')">
+                            <div class="w-10 h-10 rounded-full bg-emerald-900/20 flex items-center justify-center shrink-0"><i data-lucide="${iconName}" class="w-4 h-4 text-emerald-400"></i></div>
+                            <div class="truncate pr-4 w-full"><p class="font-medium text-sm truncate">${btn.name}</p><p class="text-xs text-on-surface-variant mt-0.5 truncate">Ketuk untuk mengirim</p></div>
+                        </div>
+                    `;
+                }
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function moveButton(key, direction, currentIndex, totalItems) {
+            if (!currentCustomButtons) return;
+            const sortedKeys = Object.keys(currentCustomButtons).sort((a, b) => (currentCustomButtons[a].order || 0) - (currentCustomButtons[b].order || 0));
+            const swapIndex = currentIndex + direction;
+            
+            if (swapIndex < 0 || swapIndex >= totalItems) return; 
+            
+            const swapKey = sortedKeys[swapIndex];
+            
+            const order1 = currentCustomButtons[key].order || currentIndex * 10; 
+            const order2 = currentCustomButtons[swapKey].order || swapIndex * 10;
+            
+            database.ref(`devices/${currentDeviceId}/custom_buttons/${key}`).update({order: order2});
+            database.ref(`devices/${currentDeviceId}/custom_buttons/${swapKey}`).update({order: order1});
+        }
+
+        function triggerCustomButton(url, name) { 
+            fetch(url, { mode: 'no-cors' }); 
+            addLog(`Sinyal webhook "${name}" dikirim!`, 'success'); 
+        }
+
+        function deleteCustomButton(key, name) {
+            if(confirm(`Yakin ingin menghapus tombol "${name}"?`)){
+                database.ref(`devices/${currentDeviceId}/custom_buttons/${key}`).remove()
+                .then(() => addLog(`Tombol "${name}" dihapus.`, 'info'))
+                .catch(err => addLog(`Gagal menghapus tombol: ${err.message}`, 'danger'));
+            }
+        }
+    </script>
+</body>
+</html>
