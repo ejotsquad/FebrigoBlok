@@ -77,7 +77,7 @@ Buka `http://localhost:3000` pada browser Anda untuk melihat hasilnya.
 ## 🌐 Live Demo
 
 Anda dapat melihat versi live dari website ini di:  
-🔗 **[my-website.com](https://febribionille.xyz)**
+🔗 **[MY_WEBSITE](https://febribionille.xyz)**
 
 ---
 
